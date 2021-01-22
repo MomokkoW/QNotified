@@ -26,7 +26,6 @@ android {
             }
         }
     }
-
     defaultConfig {
         applicationId "nil.nadph.qnotified"
         minSdkVersion 21
