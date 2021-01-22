@@ -12,7 +12,7 @@ if (performSigning) {
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
-    ndkVersion "22.0.7026061"
+    ndkVersion "21.3.6528147"
 
     if (performSigning) {
         signingConfigs {
@@ -26,7 +26,6 @@ android {
             }
         }
     }
-
     defaultConfig {
         applicationId "nil.nadph.qnotified"
         minSdkVersion 21
