@@ -1,5 +1,5 @@
 /* QNotified - An Xposed module for QQ/TIM
- * Copyright (C) 2019-2020 xenonhydride@gmail.com
+ * Copyright (C) 2019-2021 xenonhydride@gmail.com
  * https://github.com/ferredoxin/QNotified
  *
  * This software is free software: you can redistribute it and/or
@@ -19,6 +19,7 @@
 package nil.nadph.qnotified.hook;
 
 import de.robv.android.xposed.XC_MethodHook;
+import me.singleneuron.qn_kernel.data.HostInformationProviderKt;
 import me.singleneuron.qn_kernel.tlb.ConfigTable;
 import nil.nadph.qnotified.SyncUtils;
 import nil.nadph.qnotified.util.LicenseStatus;
@@ -27,7 +28,7 @@ import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static me.ketal.util.TIMVersion.TIM_3_1_1;
 import static me.singleneuron.util.QQVersion.QQ_8_1_3;
 import static nil.nadph.qnotified.util.Initiator._BaseChatPie;
-import static nil.nadph.qnotified.util.Utils.*;
+import static nil.nadph.qnotified.util.Utils.log;
 
 public class ReplyNoAtHook extends CommonDelayableHook {
     private static final ReplyNoAtHook self = new ReplyNoAtHook();
@@ -55,20 +56,6 @@ public class ReplyNoAtHook extends CommonDelayableHook {
     public boolean initOnce() {
         try {
             String method = ConfigTable.INSTANCE.getConfig(ReplyNoAtHook.class.getSimpleName());
-            /*int ver = getHostVersionCode32();
-            if (ver >= 1630) {
-                method = "l";
-            } else if (ver >= 1492) {
-                method = "createAtMsg";
-            } else if (ver >= 1406) {
-                method = "n";
-            } else if (ver > 1296) {
-                method = "m";
-            } else if (ver > 1246) {
-                method = "l";
-            } else if (ver >= 1246) {
-                method = "k";
-            }*/
             if (method == null) return false;
             findAndHookMethod(_BaseChatPie(), method, boolean.class, new XC_MethodHook(49) {
                 @Override
@@ -88,8 +75,8 @@ public class ReplyNoAtHook extends CommonDelayableHook {
 
     @Override
     public boolean isValid() {
-        if (isTim() && getHostVersionCode() >= TIM_3_1_1)
+        if (HostInformationProviderKt.getHostInformationProvider().isTim() && HostInformationProviderKt.getHostInformationProvider().getVersionCode() >= TIM_3_1_1)
             return true;
-        else return !isTim() && getHostVersionCode() >= QQ_8_1_3;
+        else return !HostInformationProviderKt.getHostInformationProvider().isTim() && HostInformationProviderKt.getHostInformationProvider().getVersionCode() >= QQ_8_1_3;
     }
 }

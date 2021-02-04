@@ -1,5 +1,5 @@
 /* QNotified - An Xposed module for QQ/TIM
- * Copyright (C) 2019-2020 xenonhydride@gmail.com
+ * Copyright (C) 2019-2021 xenonhydride@gmail.com
  * https://github.com/ferredoxin/QNotified
  *
  * This software is free software: you can redistribute it and/or
@@ -35,12 +35,12 @@ import java.util.regex.Pattern;
 
 import dalvik.system.DexClassLoader;
 import dalvik.system.PathClassLoader;
+import me.singleneuron.qn_kernel.data.HostInformationProviderKt;
 import nil.nadph.qnotified.config.ConfigManager;
 
 import static nil.nadph.qnotified.util.Initiator._BaseChatPie;
 import static nil.nadph.qnotified.util.Initiator._QQAppInterface;
-import static nil.nadph.qnotified.util.Utils.getHostVersionCode32;
-import static nil.nadph.qnotified.util.Utils.invoke_virtual;
+import static nil.nadph.qnotified.util.ReflexUtil.invoke_virtual;
 import static nil.nadph.qnotified.util.Utils.log;
 import static nil.nadph.qnotified.util.Utils.logi;
 
@@ -101,8 +101,6 @@ public class DexKit {
     public static final int N_LeftSwipeReply_Helper__reply = 20006;
     public static final int N_AtPanel__showDialogAtView = 20007;
     public static final int N_AtPanel__refreshUI = 20008;
-    // fixme
-    //public static final int N_TROOP_BASE_PIE__showNewTotalMemberCount = 20007;
     
     public static final int DEOBF_NUM_N = 8;
     
@@ -201,7 +199,7 @@ public class DexKit {
         try {
             ConfigManager cache = ConfigManager.getCache();
             int lastVersion = cache.getIntOrDefault("cache_" + a(i) + "_code", 0);
-            if (getHostVersionCode32() != lastVersion) {
+            if (HostInformationProviderKt.getHostInformationProvider().getVersionCode32() != lastVersion) {
                 return null;
             }
             String name = cache.getString("cache_" + a(i) + "_method");
@@ -223,7 +221,7 @@ public class DexKit {
         }
         int ver = -1;
         try {
-            ver = getHostVersionCode32();
+            ver = HostInformationProviderKt.getHostInformationProvider().getVersionCode32();
         } catch (Throwable ignored) {
         }
         try {
@@ -251,7 +249,7 @@ public class DexKit {
                 return null;
             }
             cache.putString("cache_" + a(i) + "_method", ret.toString());
-            cache.getAllConfig().put("cache_" + a(i) + "_code", getHostVersionCode32());
+            cache.getAllConfig().put("cache_" + a(i) + "_code", HostInformationProviderKt.getHostInformationProvider().getVersionCode32());
             cache.save();
         } catch (Exception e) {
             log(e);
@@ -346,8 +344,6 @@ public class DexKit {
                 return "atpanel__showDialogAtView";
             case N_AtPanel__refreshUI:
                 return "atpanel__refreshUI";
-//            case N_TROOP_BASE_PIE__showNewTotalMemberCount:
-//                return "troop_base_pie__showTotalMemberCount";
         }
         throw new IndexOutOfBoundsException("No class index for " + i + ",max = " + DEOBF_NUM_C);
     }
@@ -429,10 +425,7 @@ public class DexKit {
                 //guess
                 ret = "com.tencent.mobileqq.aio.helper.TogetherControlHelper";
                 break;
-            case C_GroupAppActivity:
-                //unknown
-//                ret = "com.tencent.mobileqq.activity.aio.drawer.TroopMultiCardDrawer";
-    
+            case C_GroupAppActivity:    
                 ret = "com/tencent/mobileqq/activity/aio/drawer/TroopAppShortcutDrawer";
                 break;
             case C_IntimateDrawer:
@@ -465,9 +458,6 @@ public class DexKit {
             case C_FaceManager:
                 ret = "com.tencent.mobileqq.app.face.FaceManager";
                 break;
-//            case N_TROOP_BASE_PIE__showNewTotalMemberCount:
-//                ret = "com.tencent.mobileqq.activity.aio.core.TroopChatPie";
-//                break;
             case N_BASE_CHAT_PIE__INIT:
             case N_BASE_CHAT_PIE__handleNightMask:
             case N_BASE_CHAT_PIE__updateSession:
@@ -567,8 +557,6 @@ public class DexKit {
                 return new byte[][]{new byte[]{0x1C, 0x5B, 0x73, 0x65, 0x6E, 0x64, 0x4D, 0x75, 0x6C, 0x74, 0x69, 0x4D, 0x73, 0x67, 0x5D, 0x64, 0x61, 0x74, 0x61, 0x2E, 0x6C, 0x65, 0x6E, 0x67, 0x74, 0x68, 0x20, 0x3D, 0x20}};
             case N_LeftSwipeReply_Helper__reply:
                 return new byte[][]{new byte[]{0x09, 0x30, 0x58, 0x38, 0x30, 0x30, 0x41, 0x39, 0x32, 0x46}};
-//            case N_TROOP_BASE_PIE__showNewTotalMemberCount:
-//                return new byte[][]{new byte[]{0x17, 0x73, 0x68, 0x6f, 0x77, 0x4e, 0x65, 0x77, 0x54, 0x72, 0x6f, 0x6f, 0x70, 0x4d, 0x65, 0x6d, 0x62, 0x65, 0x72, 0x43, 0x6f, 0x75, 0x6e, 0x74}};
             case C_ClockInEntryHelper:
                 return new byte[][]{
                     new byte[]{0x1f, 0x69, 0x73, 0x53, 0x68, 0x6f, 0x77, 0x54, 0x6f, 0x67, 0x65, 0x74, 0x68, 0x65, 0x72, 0x45, 0x6e, 0x74, 0x72, 0x79},
@@ -661,8 +649,6 @@ public class DexKit {
                 return new int[]{10, 4};
             case C_CustomWidgetUtil:
                 return new int[]{5, 4, 9};
-//            case N_TROOP_BASE_PIE__showNewTotalMemberCount:
-//                return new int[]{6, 8};
             case C_ClockInEntryHelper:
                 return new int[]{6, 2};
             case C_CaptureUtil:
@@ -875,8 +861,7 @@ public class DexKit {
                 }
                 break;
             case N_LeftSwipeReply_Helper__reply:
-//			case N_TROOP_BASE_PIE__showNewTotalMemberCount:
-                //TODO: this must only has one result
+                //NOTICE: this must only has one result
     
                 return (DexMethodDescriptor) __methods.toArray()[0];
             case N_BASE_CHAT_PIE__createMulti:
@@ -1181,7 +1166,6 @@ public class DexKit {
         int[] ret = new int[1];
         ret[0] = DexFlow.arrayIndexOf(buf, target, 0, buf.length);
         ret[0] = DexFlow.arrayIndexOf(buf, DexFlow.int2u4le(ret[0]), 0, buf.length);
-        //System.out.println(ret[0]);
         int strIdx = (ret[0] - DexFlow.readLe32(buf, 0x3c)) / 4;
         if (strIdx > 0xFFFF) {
             target = DexFlow.int2u4le(strIdx);
@@ -1269,9 +1253,6 @@ public class DexKit {
                 }
                 in.close();
                 content = baos.toByteArray();
-				/*if (i == 1) {
-					log("dex" + i + ".len :" + content.length);
-				}*/
                 ArrayList<Integer> opcodeOffsets = a(content, key);
                 for (int j = 0; j < opcodeOffsets.size(); j++) {
                     try {

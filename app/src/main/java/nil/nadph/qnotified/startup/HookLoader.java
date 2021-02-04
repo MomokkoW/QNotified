@@ -1,4 +1,22 @@
-package nil.nadph.qnotified;
+/* QNotified - An Xposed module for QQ/TIM
+ * Copyright (C) 2019-2021 xenonhydride@gmail.com
+ * https://github.com/ferredoxin/QNotified
+ *
+ * This software is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this software.  If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
+package nil.nadph.qnotified.startup;
 
 import android.annotation.TargetApi;
 import android.app.Application;
@@ -6,17 +24,17 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
+import java.io.File;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import dalvik.system.PathClassLoader;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
-
-import java.io.File;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author DX
@@ -89,8 +107,6 @@ public class HookLoader implements IXposedHookLoadPackage {
      * @throws Throwable 抛出各种异常,包括具体hook逻辑的异常,寻找apk文件异常,反射加载Class异常等
      */
     private void invokeHandleHookMethod(Context context, String modulePackageName, String handleHookClass, String handleHookMethod, XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
-//        File apkFile = findApkFileBySDK(modulePackageName);//会受其它Xposed模块hook 当前宿主程序的SDK_INT的影响
-//        File apkFile = findApkFile(modulePackageName);
         //原来的两种方式不是很好,改用这种新的方式
         File apkFile = findApkFile(context, modulePackageName);
         if (apkFile == null) {
@@ -99,11 +115,7 @@ public class HookLoader implements IXposedHookLoadPackage {
         //加载指定的hook逻辑处理类，并调用它的handleHook方法
         PathClassLoader pathClassLoader = new PathClassLoader(apkFile.getAbsolutePath(), XposedBridge.class.getClassLoader());
         Class<?> cls = Class.forName(handleHookClass, true, pathClassLoader);
-		/*Utils.log(apkFile.getAbsolutePath());
-		 Utils.log(cls.toString());
-		 Utils.log(pathClassLoader.toString());*/
         Object instance = cls.newInstance();
-        //instance.handleLoadPackage(loadPackageParam);
         Method method = cls.getDeclaredMethod(handleHookMethod, XC_LoadPackage.LoadPackageParam.class);
         method.invoke(instance, loadPackageParam);
     }

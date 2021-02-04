@@ -82,3 +82,5 @@ app/signing.gradle
 .settings
 .project
 .classpath
+app/signing.gradle
+.vscode

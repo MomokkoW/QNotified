@@ -1,5 +1,5 @@
 /* QNotified - An Xposed module for QQ/TIM
- * Copyright (C) 2019-2020 xenonhydride@gmail.com
+ * Copyright (C) 2019-2021 xenonhydride@gmail.com
  * https://github.com/ferredoxin/QNotified
  *
  * This software is free software: you can redistribute it and/or
@@ -46,11 +46,12 @@ import java.util.Arrays;
 import java.util.Date;
 
 import me.singleneuron.util.HookStatue;
-import nil.nadph.qnotified.HookEntry;
+import nil.nadph.qnotified.BuildConfig;
 import nil.nadph.qnotified.R;
 import nil.nadph.qnotified.SyncUtils;
 import nil.nadph.qnotified.databinding.MainV2Binding;
 import nil.nadph.qnotified.lifecycle.JumpActivityEntryHook;
+import nil.nadph.qnotified.startup.HookEntry;
 import nil.nadph.qnotified.util.Natives;
 import nil.nadph.qnotified.util.UiThread;
 import nil.nadph.qnotified.util.Utils;
@@ -70,7 +71,7 @@ public class ConfigV2Activity extends AppCompatActivity {
         String str = "";
         try {
             str += "SystemClassLoader:" + ClassLoader.getSystemClassLoader() +
-                    "\nActiveModuleVersion:" + Utils.getActiveModuleVersion()
+                    "\nActiveModuleVersion:" + BuildConfig.VERSION_NAME
                     + "\nThisVersion:" + Utils.QN_VERSION_NAME + "";
         } catch (Throwable r) {
             str += r;
@@ -88,7 +89,7 @@ public class ConfigV2Activity extends AppCompatActivity {
         } catch (IOException e) {
             start = e.toString();
         }
-        if ("nil.nadph.qnotified.HookLoader".equals(start)) {
+        if ("nil.nadph.qnotified.startup.HookLoader".equals(start)) {
             isDynLoad = true;
         }
         try {

@@ -1,3 +1,21 @@
+/* QNotified - An Xposed module for QQ/TIM
+ * Copyright (C) 2019-2021 xenonhydride@gmail.com
+ * https://github.com/ferredoxin/QNotified
+ *
+ * This software is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this software.  If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
 package com.rymmmmm.hook;
 
 import android.content.res.AssetManager;
@@ -9,17 +27,14 @@ import java.lang.reflect.Method;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
-import nil.nadph.qnotified.SyncUtils;
 import nil.nadph.qnotified.dialog.RikkaCustomSplash;
-import nil.nadph.qnotified.hook.BaseDelayableHook;
-import nil.nadph.qnotified.step.Step;
+import nil.nadph.qnotified.hook.CommonDelayableHook;
 import nil.nadph.qnotified.util.LicenseStatus;
 import nil.nadph.qnotified.util.Utils;
 
 //自定义启动图
-public class CustomSplash extends BaseDelayableHook {
+public class CustomSplash extends CommonDelayableHook {
     private static final CustomSplash self = new CustomSplash();
-    private boolean isInit = false;
 
     private static final byte[] TRANSPARENT_PNG = new byte[]{
             (byte) 0x89, (byte) 0x50, (byte) 0x4E, (byte) 0x47, (byte) 0x0D, (byte) 0x0A, (byte) 0x1A, (byte) 0x0A,
@@ -36,19 +51,12 @@ public class CustomSplash extends BaseDelayableHook {
         return self;
     }
 
-    @Override
-    public int getEffectiveProc() {
-        return SyncUtils.PROC_MAIN;
+    protected CustomSplash() {
+        super("__NOT_USED__");
     }
 
     @Override
-    public boolean isInited() {
-        return isInit;
-    }
-
-    @Override
-    public boolean init() {
-        if (isInit) return true;
+    public boolean initOnce() {
         try {
             Method open = AssetManager.class.getDeclaredMethod("open", String.class, int.class);
             XposedBridge.hookMethod(open, new XC_MethodHook(53) {
@@ -70,17 +78,11 @@ public class CustomSplash extends BaseDelayableHook {
                     }
                 }
             });
-            isInit = true;
             return true;
         } catch (Throwable e) {
             Utils.log(e);
             return false;
         }
-    }
-
-    @Override
-    public Step[] getPreconditions() {
-        return new Step[0];
     }
 
     @Override

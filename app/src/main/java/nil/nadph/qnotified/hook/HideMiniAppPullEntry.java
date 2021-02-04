@@ -1,5 +1,5 @@
 /* QNotified - An Xposed module for QQ/TIM
- * Copyright (C) 2019-2020 xenonhydride@gmail.com
+ * Copyright (C) 2019-2021 xenonhydride@gmail.com
  * https://github.com/ferredoxin/QNotified
  *
  * This software is free software: you can redistribute it and/or
@@ -24,33 +24,31 @@ import java.lang.reflect.Method;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedBridge;
-import nil.nadph.qnotified.SyncUtils;
+import me.singleneuron.qn_kernel.data.HostInformationProviderKt;
 import nil.nadph.qnotified.config.ConfigItems;
 import nil.nadph.qnotified.config.ConfigManager;
 import nil.nadph.qnotified.util.Initiator;
-import nil.nadph.qnotified.util.Utils;
 
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static me.singleneuron.util.QQVersion.QQ_8_2_6;
 import static nil.nadph.qnotified.util.Initiator.load;
-import static nil.nadph.qnotified.util.Utils.getHostVersionCode32;
 import static nil.nadph.qnotified.util.Utils.log;
 
 public class HideMiniAppPullEntry extends CommonDelayableHook {
     public static final HideMiniAppPullEntry INSTANCE = new HideMiniAppPullEntry();
 
     protected HideMiniAppPullEntry() {
-        super(ConfigItems.qn_hide_msg_list_miniapp, SyncUtils.PROC_MAIN, false);
+        super(ConfigItems.qn_hide_msg_list_miniapp);
     }
 
     @Override
     protected boolean initOnce() {
         try {
-            if (Utils.isTim()) return false;
+            if (HostInformationProviderKt.getHostInformationProvider().isTim()) return false;
             ConfigManager cache = ConfigManager.getCache();
             if (isEnabled()) {
                 int lastVersion = cache.getIntOrDefault("qn_hide_msg_list_miniapp_version_code", 0);
-                if (getHostVersionCode32() == lastVersion) {
+                if (HostInformationProviderKt.getHostInformationProvider().getVersionCode32() == lastVersion) {
                     String methodName = cache.getString("qn_hide_msg_list_miniapp_method_name");
                     findAndHookMethod(Initiator._Conversation(), methodName, XC_MethodReplacement.returnConstant(null));
                 } else {
@@ -81,26 +79,10 @@ public class HideMiniAppPullEntry extends CommonDelayableHook {
                                 }
                             });
                     }
-					/*try {
-					 findAndHookMethod(load("com.tencent.mobileqq.app.FrameFragment"), "createTabContent", String.class, new XC_MethodReplacement(39) {
-					 @Override
-					 protected Object replaceHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
-					 try {
-					 Method m = (Method) param.method;
-					 m.setAccessible(true);
-					 XposedBridge.invokeOriginalMethod(m, param.thisObject, param.args);
-					 } catch (UnsupportedOperationException e) {
-					 } catch (Throwable t) {
-					 log(t);
-					 }
-					 return null;
-					 }
-					 });
-					 } catch (Exception e) {}*/
 
                     Class<?> tmp;
                     Class<?> miniapp = null;
-                    if (Utils.getHostVersionCode32() >= QQ_8_2_6) {
+                    if (HostInformationProviderKt.getHostInformationProvider().getVersionCode() >= QQ_8_2_6) {
                         //for 8.2.6
                         miniapp = load("com/tencent/mobileqq/mini/entry/MiniAppDesktop");
                         if (miniapp == null) {
@@ -142,7 +124,7 @@ public class HideMiniAppPullEntry extends CommonDelayableHook {
                                 throw new NullPointerException("Failed to get Conversation.?() to hide MiniApp!");
                             ConfigManager cache = ConfigManager.getCache();
                             cache.putString("qn_hide_msg_list_miniapp_method_name", methodName);
-                            cache.getAllConfig().put("qn_hide_msg_list_miniapp_version_code", getHostVersionCode32());
+                            cache.getAllConfig().put("qn_hide_msg_list_miniapp_version_code", HostInformationProviderKt.getHostInformationProvider().getVersionCode32());
                             cache.save();
                             param.setThrowable(new UnsupportedOperationException("MiniAppEntry disabled"));
                         }

@@ -1,5 +1,5 @@
 /* QNotified - An Xposed module for QQ/TIM
- * Copyright (C) 2019-2020 xenonhydride@gmail.com
+ * Copyright (C) 2019-2021 xenonhydride@gmail.com
  * https://github.com/ferredoxin/QNotified
  *
  * This software is free software: you can redistribute it and/or
@@ -39,9 +39,10 @@ import nil.nadph.qnotified.ui.ResUtils;
 import nil.nadph.qnotified.util.CliOper;
 import nil.nadph.qnotified.util.Utils;
 
-import static nil.nadph.qnotified.lifecycle.ActProxyMgr.ACTIVITY_PROXY_ACTION;
 import static nil.nadph.qnotified.util.Initiator.load;
-import static nil.nadph.qnotified.util.Utils.*;
+import static nil.nadph.qnotified.util.ReflexUtil.iput_object;
+import static nil.nadph.qnotified.util.ReflexUtil.new_instance;
+import static nil.nadph.qnotified.util.Utils.log;
 
 @SuppressWarnings("deprecation")
 @SuppressLint("Registered")
@@ -90,7 +91,6 @@ public class IphoneTitleBarActivityCompat extends IphoneTitleBarActivity {
             try {
                 f = cl.getDeclaredField("rightViewText");
             } catch (NoSuchFieldException ex) {
-                //WTF!!! it's 0202 now, still using QQ<6.5.5???
                 Field l = null, r = null;
                 for (Field fs : cl.getDeclaredFields()) {
                     if (!Modifier.isPublic(fs.getModifiers())) {
@@ -127,7 +127,6 @@ public class IphoneTitleBarActivityCompat extends IphoneTitleBarActivity {
         try {
             f = cl.getDeclaredField("leftViewText");
         } catch (NoSuchFieldException ex) {
-            //WTF!!! it's 0202 now, still using QQ<6.5.5???
             Field l = null, r = null;
             for (Field fs : cl.getDeclaredFields()) {
                 if (!Modifier.isPublic(fs.getModifiers())) {

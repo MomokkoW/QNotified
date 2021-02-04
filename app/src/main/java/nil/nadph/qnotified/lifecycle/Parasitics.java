@@ -1,5 +1,5 @@
 /* QNotified - An Xposed module for QQ/TIM
- * Copyright (C) 2019-2020 xenonhydride@gmail.com
+ * Copyright (C) 2019-2021 xenonhydride@gmail.com
  * https://github.com/ferredoxin/QNotified
  *
  * This software is free software: you can redistribute it and/or
@@ -30,40 +30,27 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
-import android.os.PersistableBundle;
-import android.os.TestLooperManager;
+import android.os.*;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.lang.reflect.*;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import dalvik.system.BaseDexClassLoader;
+import me.singleneuron.qn_kernel.data.HostInformationProviderKt;
 import nil.nadph.qnotified.MainHook;
 import nil.nadph.qnotified.R;
-import nil.nadph.qnotified.ui.___WindowIsTranslucent;
 import nil.nadph.qnotified.util.Initiator;
+import nil.nadph.qnotified.ui.___WindowIsTranslucent;
 import nil.nadph.qnotified.util.MainProcess;
 import nil.nadph.qnotified.util.Nullable;
-import nil.nadph.qnotified.util.Utils;
 
-import static nil.nadph.qnotified.util.Utils.iget_object_or_null;
-import static nil.nadph.qnotified.util.Utils.log;
-import static nil.nadph.qnotified.util.Utils.logd;
-import static nil.nadph.qnotified.util.Utils.loge;
-import static nil.nadph.qnotified.util.Utils.logi;
+import static nil.nadph.qnotified.util.ReflexUtil.iget_object_or_null;
+import static nil.nadph.qnotified.util.Utils.*;
 
 /**
  * Inject module Activities into host process and resources injection.
@@ -75,11 +62,31 @@ public class Parasitics {
 
     private static String sModulePath = null;
     private static boolean __stub_hooked = false;
+    private static long sResInjectBeginTime = 0;
+    private static long sResInjectEndTime = 0;
+    private static long sActStubHookBeginTime = 0;
+    private static long sActStubHookEndTime = 0;
+
+    public static int getResourceInjectionCost() {
+        if (sResInjectEndTime > 0) {
+            return (int) (sResInjectEndTime - sResInjectBeginTime);
+        }
+        return -1;
+    }
+
+    public static int getActivityStubHookCost() {
+        if (sActStubHookEndTime > 0) {
+            return (int) (sActStubHookEndTime - sActStubHookBeginTime);
+        }
+        return -1;
+    }
 
     @MainProcess
     @SuppressLint("PrivateApi")
     public static void injectModuleResources(Resources res) {
-        if (res == null) return;
+        if (res == null) {
+            return;
+        }
         try {
             res.getString(R.string.res_inject_success);
             return;
@@ -87,16 +94,21 @@ public class Parasitics {
         }
         try {
             if (sModulePath == null) {
+                if (sResInjectBeginTime == 0) {
+                    sResInjectBeginTime = System.currentTimeMillis();
+                }
                 String modulePath = null;
                 BaseDexClassLoader pcl = (BaseDexClassLoader) MainHook.class.getClassLoader();
                 Object pathList = iget_object_or_null(pcl, "pathList");
                 Object[] dexElements = (Object[]) iget_object_or_null(pathList, "dexElements");
                 for (Object element : dexElements) {
                     File file = (File) iget_object_or_null(element, "path");
-                    if (file == null || file.isDirectory())
+                    if (file == null || file.isDirectory()) {
                         file = (File) iget_object_or_null(element, "zip");
-                    if (file == null || file.isDirectory())
+                    }
+                    if (file == null || file.isDirectory()) {
                         file = (File) iget_object_or_null(element, "file");
+                    }
                     if (file != null && !file.isDirectory()) {
                         String path = file.getPath();
                         if (modulePath == null || !modulePath.contains("nil.nadph.qnotified")) {
@@ -116,6 +128,9 @@ public class Parasitics {
             int cookie = (int) addAssetPath.invoke(assets, sModulePath);
             try {
                 logd("injectModuleResources: " + res.getString(R.string.res_inject_success));
+                if (sResInjectEndTime == 0) {
+                    sResInjectEndTime = System.currentTimeMillis();
+                }
             } catch (Resources.NotFoundException e) {
                 loge("Fatal: injectModuleResources: test injection failure!");
                 loge("injectModuleResources: cookie=" + cookie + ", path=" + sModulePath + ", loader=" + MainHook.class.getClassLoader());
@@ -142,8 +157,11 @@ public class Parasitics {
     @MainProcess
     @SuppressLint("PrivateApi")
     public static void initForStubActivity(Context ctx) {
-        if (__stub_hooked) return;
+        if (__stub_hooked) {
+            return;
+        }
         try {
+            sActStubHookBeginTime = System.currentTimeMillis();
             Class<?> clazz_ActivityThread = Class.forName("android.app.ActivityThread");
             Method currentActivityThread = clazz_ActivityThread.getDeclaredMethod("currentActivityThread");
             currentActivityThread.setAccessible(true);
@@ -204,10 +222,9 @@ public class Parasitics {
                     new IActivityManagerHandler(mDefaultTaskMgr));
                 mInstanceField.set(singleton, proxy2);
             } catch (Exception err3) {
-                //log(err3);
-                //ignore
             }
             //End of IActivityTaskManager
+            sActStubHookEndTime = System.currentTimeMillis();
             __stub_hooked = true;
         } catch (Exception e) {
             log(e);
@@ -234,8 +251,7 @@ public class Parasitics {
                 if (index != -1) {
                     Intent raw = (Intent) args[index];
                     ComponentName component = raw.getComponent();
-                    Context hostApp = Utils.getApplication();
-                    //log("startActivity, rawIntent=" + raw);
+                    Context hostApp = HostInformationProviderKt.getHostInformationProvider().getApplicationContext();
                     if (hostApp != null && component != null
                         && hostApp.getPackageName().equals(component.getPackageName())
                         && ActProxyMgr.isModuleProxyActivity(component.getClassName())) {
@@ -252,7 +268,6 @@ public class Parasitics {
                             isTranslucent ? ActProxyMgr.STUB_TRANSLUCENT_ACTIVITY : ActProxyMgr.STUB_DEFAULT_ACTIVITY);
                         wrapper.putExtra(ActProxyMgr.ACTIVITY_PROXY_INTENT, raw);
                         args[index] = wrapper;
-                        //log("startActivity, wrap intent with " + wrapper);
                     }
                 }
             }
@@ -279,7 +294,6 @@ public class Parasitics {
                     Field field_intent = record.getClass().getDeclaredField("intent");
                     field_intent.setAccessible(true);
                     Intent intent = (Intent) field_intent.get(record);
-                    //log("handleMessage/100: " + intent);
                     Bundle bundle = null;
                     try {
                         Field fExtras = Intent.class.getDeclaredField("mExtras");
@@ -294,7 +308,6 @@ public class Parasitics {
                         if (intent.hasExtra(ActProxyMgr.ACTIVITY_PROXY_INTENT)) {
                             Intent realIntent = intent.getParcelableExtra(ActProxyMgr.ACTIVITY_PROXY_INTENT);
                             field_intent.set(record, realIntent);
-                            //log("unwrap, real=" + realIntent);
                         }
                     }
                 } catch (Exception e) {
@@ -328,7 +341,6 @@ public class Parasitics {
                                         if (wrapper.hasExtra(ActProxyMgr.ACTIVITY_PROXY_INTENT)) {
                                             Intent realIntent = wrapper.getParcelableExtra(ActProxyMgr.ACTIVITY_PROXY_INTENT);
                                             fmIntent.set(item, realIntent);
-                                            //log("unwrap, real=" + realIntent);
                                         }
                                     }
                                 }
@@ -358,7 +370,6 @@ public class Parasitics {
         @Override
         public Activity newActivity(ClassLoader cl, String className, Intent intent) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
             try {
-                //log("newActivity: " + className);
                 return mBase.newActivity(cl, className, intent);
             } catch (Exception e) {
                 if (ActProxyMgr.isModuleProxyActivity(className)) {
