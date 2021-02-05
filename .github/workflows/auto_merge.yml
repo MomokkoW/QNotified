@@ -3,7 +3,7 @@ name: auto_merge
 on:
   workflow_dispatch:
   schedule:
-    - cron: * 12 * * *
+    - cron: 30 8 * * *
 
 
 jobs:
@@ -13,7 +13,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       with:
-        ref: main
+        ref: master
         fetch-depth: 0
         lfs: true
 
@@ -23,7 +23,7 @@ jobs:
         git config --global user.name "github-actions[bot]"
     - name: Load upstream commits
       run:
-        git pull https://github.com/ferredoxin/QNotified.git master --log --no-commit
+        git pull https://github.com/ferredoxin/QNotified.git master
     - name: Apply commit changes
       run: |
         if [ -f ./.git/MERGE_MSG ]; then
@@ -36,6 +36,6 @@ jobs:
         fi
     - name: Push Commits
       env:
-        DOWNSTREAM_BRANCH: main
+        DOWNSTREAM_BRANCH: master
         TZ: Asia/Shanghai
       run: git push origin $DOWNSTREAM_BRANCH
