@@ -11,12 +11,12 @@ if (performSigning) {
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
-    ndkVersion "21.3.6528147"
+    ndkVersion "21.4.7075529"
     defaultConfig {
         applicationId "nil.nadph.qnotified"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode (getTimeStamp.call() as int)
+        versionCode(getTimeStamp.call() as int)
         versionName "0.8.11" + (getGitHeadRefsSuffix.call() as String)
         multiDexEnabled false
         ndk {
@@ -26,6 +26,18 @@ android {
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+    }
+    if (performSigning) {
+        signingConfigs {
+            release {
+                storeFile file(project.signing.storeFilePath)
+                storePassword project.signing.storePassword
+                keyAlias project.signing.keyAlias
+                keyPassword project.signing.keyPassword
+                v1SigningEnabled true
+                v2SigningEnabled true
             }
         }
     }
@@ -64,22 +76,11 @@ android {
     buildFeatures {
         viewBinding true
     }
-    if (performSigning) {
-        signingConfigs {
-            release {
-                storeFile file(project.signing.storeFilePath)
-                storePassword project.signing.storePassword
-                keyAlias project.signing.keyAlias
-                keyPassword project.signing.keyPassword
-                v1SigningEnabled true
-                v2SigningEnabled true
-            }
-        }
-    }   
 }
 
 dependencies {
     compileOnly fileTree(include: ['*.jar'], dir: 'lib')
+    compileOnly project(":stub")
     implementation 'com.flyco.tablayout:FlycoTabLayout_Lib:2.1.2'
     implementation 'com.jaredrummler:colorpicker:1.1.0'
     implementation 'de.psdev.licensesdialog:licensesdialog:2.1.0'

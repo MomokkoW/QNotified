@@ -29,8 +29,8 @@ import java.lang.reflect.Method;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
-import me.singleneuron.qn_kernel.data.HostInformationProviderKt;
 import me.singleneuron.qn_kernel.tlb.ConfigTable;
+import nil.nadph.qnotified.H;
 import nil.nadph.qnotified.SyncUtils;
 import nil.nadph.qnotified.config.ConfigManager;
 import nil.nadph.qnotified.hook.CommonDelayableHook;
@@ -44,8 +44,7 @@ import static me.ketal.util.TIMVersion.TIM_3_1_1;
 import static me.singleneuron.util.QQVersion.QQ_8_2_6;
 import static nil.nadph.qnotified.util.Initiator._BaseChatPie;
 import static nil.nadph.qnotified.util.Initiator._ChatMessage;
-import static nil.nadph.qnotified.util.ReflexUtil.findMethodByTypes_1;
-import static nil.nadph.qnotified.util.ReflexUtil.invoke_virtual_any;
+import static nil.nadph.qnotified.util.ReflexUtil.*;
 import static nil.nadph.qnotified.util.Utils.*;
 
 public class LeftSwipeReplyHook extends CommonDelayableHook {
@@ -68,18 +67,17 @@ public class LeftSwipeReplyHook extends CommonDelayableHook {
 
     @Override
     public boolean isValid() {
-        if (HostInformationProviderKt.getHostInformationProvider().isTim() && HostInformationProviderKt.getHostInformationProvider().getVersionCode() >= TIM_3_1_1)
+        if (H.isTIM() && H.getVersionCode() >= TIM_3_1_1)
             return true;
-        else return !HostInformationProviderKt.getHostInformationProvider().isTim() && HostInformationProviderKt.getHostInformationProvider().getVersionCode() >= QQ_8_2_6;
+        else return !H.isTIM() && H.getVersionCode() >= QQ_8_2_6;
     }
 
     @Override
     protected boolean initOnce() {
         try {
             Method replyMethod = DexKit.doFindMethod(DexKit.N_LeftSwipeReply_Helper__reply);
-            if (replyMethod == null) return false;
             Class<?> hookClass = replyMethod.getDeclaringClass();
-            String methodName = HostInformationProviderKt.getHostInformationProvider().isTim() ? "L" : "a";
+            String methodName = H.isTIM() ? "L" : "a";
             XposedHelpers.findAndHookMethod(hookClass, methodName, float.class, float.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) {
@@ -115,7 +113,7 @@ public class LeftSwipeReplyHook extends CommonDelayableHook {
                 }
             });
 
-            methodName = HostInformationProviderKt.getHostInformationProvider().isTim() ? ConfigTable.INSTANCE.getConfig(LeftSwipeReplyHook.class.getSimpleName()) : "a";
+            methodName = H.isTIM() ? ConfigTable.INSTANCE.getConfig(LeftSwipeReplyHook.class.getSimpleName()) : "a";
             XposedBridge.hookMethod(hasMethod(hookClass, methodName, int.class), new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) {
@@ -166,9 +164,9 @@ public class LeftSwipeReplyHook extends CommonDelayableHook {
         } catch (Exception e) {
             Utils.log(e);
             if (Looper.myLooper() == Looper.getMainLooper()) {
-                Toasts.error(HostInformationProviderKt.getHostInformationProvider().getApplicationContext(), e + "");
+                Toasts.error(H.getApplication(), e + "");
             } else {
-                SyncUtils.post(() -> Toasts.error(HostInformationProviderKt.getHostInformationProvider().getApplicationContext(), e + ""));
+                SyncUtils.post(() -> Toasts.error(H.getApplication(), e + ""));
             }
         }
     }

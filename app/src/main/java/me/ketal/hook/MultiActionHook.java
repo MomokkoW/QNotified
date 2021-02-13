@@ -33,8 +33,8 @@ import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
-import me.singleneuron.qn_kernel.data.HostInformationProviderKt;
 import me.singleneuron.qn_kernel.tlb.ConfigTable;
+import nil.nadph.qnotified.H;
 import nil.nadph.qnotified.R;
 import nil.nadph.qnotified.bridge.QQMessageFacade;
 import nil.nadph.qnotified.hook.CommonDelayableHook;
@@ -45,13 +45,12 @@ import nil.nadph.qnotified.util.DexKit;
 import static nil.nadph.qnotified.util.Initiator._BaseChatPie;
 import static nil.nadph.qnotified.util.Initiator._ChatMessage;
 import static nil.nadph.qnotified.util.ReflexUtil.*;
-import static nil.nadph.qnotified.util.Utils.getFirstByType;
 import static nil.nadph.qnotified.util.Utils.log;
 
 public class MultiActionHook extends CommonDelayableHook {
     public static final MultiActionHook INSTANCE = new MultiActionHook();
     private static Bitmap img;
-    private final String fieldName = HostInformationProviderKt.getHostInformationProvider().isTim() ? ConfigTable.INSTANCE.getConfig(MultiActionHook.class.getSimpleName()) : "a";
+    private final String fieldName = H.isTIM() ? ConfigTable.INSTANCE.getConfig(MultiActionHook.class.getSimpleName()) : "a";
     private Object baseChatPie;
 
     MultiActionHook() {
