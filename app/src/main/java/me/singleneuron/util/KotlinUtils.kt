@@ -162,9 +162,8 @@ fun showEulaDialog(activity: Activity) {
     button.isEnabled = false
     Thread {
         var time = 1
-        if (LicenseStatus.getCurrentUserWhiteFlags()!=0) time = 1
-        if (LicenseStatus.isInsider()) time = 1
-        if (LicenseStatus.getCurrentUserBlackFlags()!=0) time = 1
+        if (LicenseStatus.isInsider()) time = if (Math.random()<0.1) 86400 else 5
+        if (Math.random()<0.01) time = - time
         do {
             Utils.runOnUiThread { button.text = "1 ($time)" }
             try {

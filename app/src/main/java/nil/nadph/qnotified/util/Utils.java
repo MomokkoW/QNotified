@@ -29,6 +29,8 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.Nullable;
+
 import com.tencent.mobileqq.app.QQAppInterface;
 
 import java.io.*;
@@ -45,7 +47,6 @@ import me.singleneuron.qn_kernel.data.HostInformationProviderKt;
 import me.singleneuron.util.QQVersion;
 import mqq.app.AppRuntime;
 import nil.nadph.qnotified.BuildConfig;
-import nil.nadph.qnotified.SyncUtils;
 import nil.nadph.qnotified.ui.ResUtils;
 
 import static me.singleneuron.util.KotlinUtilsKt.readFromBufferedReader;
@@ -215,7 +216,7 @@ public class Utils {
             logw("getAppRuntime/W invoked before NewRuntime.step");
             return null;
         }
-        Object baseApplicationImpl = HostInformationProviderKt.getHostInformationProvider().getApplicationContext();
+        Object baseApplicationImpl = HostInformationProviderKt.getHostInfo().getApplication();
         try {
             if (f_mAppRuntime == null) {
                 f_mAppRuntime = Class.forName("mqq.app.MobileQQ").getDeclaredField("mAppRuntime");
@@ -239,7 +240,7 @@ public class Utils {
     }
 
     public static Object getFriendListHandler() {
-        if (HostInformationProviderKt.getHostInformationProvider().getVersionCode() >= QQVersion.QQ_8_5_0) {
+        if (HostInformationProviderKt.requireMinQQVersion(QQVersion.QQ_8_5_0)) {
             try {
                 Class cl_bh = load("com/tencent/mobileqq/app/BusinessHandler");
                 Class cl_flh = load("com/tencent/mobileqq/app/FriendListHandler");
@@ -467,7 +468,7 @@ public class Utils {
     }
 
     public static void showErrorToastAnywhere(String text) {
-        Toasts.error(HostInformationProviderKt.getHostInformationProvider().getApplicationContext(), text, Toasts.LENGTH_SHORT);
+        Toasts.error(HostInformationProviderKt.getHostInfo().getApplication(), text, Toasts.LENGTH_SHORT);
     }
 
     public static void dumpTrace() {
@@ -667,7 +668,7 @@ public class Utils {
     public static long getBuildTimestamp() {
         Context ctx = null;
         try {
-            ctx = HostInformationProviderKt.getHostInformationProvider().getApplicationContext();
+            ctx = HostInformationProviderKt.getHostInfo().getApplication();
         } catch (Throwable ignored) {
         }
         if (ctx == null) {

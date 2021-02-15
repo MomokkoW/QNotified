@@ -32,6 +32,10 @@ import com.rymmmmm.hook.CustomSplash;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import cc.ioctl.hook.GagInfoDisclosure;
+import cc.ioctl.hook.MuteAtAllAndRedPacket;
+import cc.ioctl.hook.MuteQZoneThumbsUp;
+import cc.ioctl.hook.RevokeMsgHook;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import me.kyuubiran.hook.RemoveCameraButton;
@@ -41,8 +45,8 @@ import nil.nadph.qnotified.config.ConfigItems;
 import nil.nadph.qnotified.hook.*;
 import nil.nadph.qnotified.lifecycle.JumpActivityEntryHook;
 import nil.nadph.qnotified.lifecycle.Parasitics;
-import nil.nadph.qnotified.util.Initiator;
 import nil.nadph.qnotified.ui.ResUtils;
+import nil.nadph.qnotified.util.Initiator;
 import nil.nadph.qnotified.util.LicenseStatus;
 import nil.nadph.qnotified.util.MainProcess;
 import nil.nadph.qnotified.util.Utils;
@@ -211,12 +215,9 @@ public class MainHook {
             }
             XposedBridge.hookMethod(doStep, new XC_MethodHook(52) {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                protected void afterHookedMethod(MethodHookParam param) {
+                    // fix error in :video, and QZone启动失败
                     Utils.$access$set$sAppRuntimeInit(true);
-                    if (SyncUtils.isMainProcess()) {
-                        // fix error in :video, and QZone启动失败
-                        LicenseStatus.sDisableCommonHooks = LicenseStatus.isLoadingDisabled() || LicenseStatus.isBlacklisted() || LicenseStatus.isSilentGone();
-                    }
                 }
             });
         } catch (Throwable e) {
@@ -251,7 +252,7 @@ public class MainHook {
                     if (dir == null) dir = iget_object_or_null(param.thisObject, "a", director);
                     if (dir == null) dir = getFirstNSFByType(param.thisObject, director);
                     if (SyncUtils.isMainProcess()) {
-                        ResUtils.loadThemeByArsc(HostInformationProviderKt.getHostInformationProvider().getApplicationContext(), false);
+                        ResUtils.loadThemeByArsc(HostInformationProviderKt.getHostInfo().getApplication(), false);
                     }
                     InjectDelayableHooks.step(dir);
                     onAppStartupForMain();

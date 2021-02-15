@@ -18,10 +18,10 @@
  */
 package me.nextalone.hook
 
-import de.robv.android.xposed.XC_MethodHook
-import me.nextalone.util.Utils.hook
-import me.nextalone.util.Utils.methods
-import me.singleneuron.qn_kernel.data.hostInformationProvider
+import me.nextalone.util.hookBefore
+import me.nextalone.util.hookFalse
+import me.nextalone.util.methods
+import me.singleneuron.qn_kernel.data.hostInfo
 import me.singleneuron.qn_kernel.tlb.ConfigTable
 import me.singleneuron.util.QQVersion
 import nil.nadph.qnotified.hook.CommonDelayableHook
@@ -29,21 +29,17 @@ import nil.nadph.qnotified.util.Utils
 import java.lang.reflect.Method
 
 object HideTotalNumber : CommonDelayableHook("na_hide_total_number") {
-    
+
     override fun initOnce(): Boolean {
         return try {
             var className = "com.tencent.mobileqq.activity.aio.core.TroopChatPie"
-            if (hostInformationProvider.versionCode <= QQVersion.QQ_8_4_8) {
+            if (hostInfo.versionCode <= QQVersion.QQ_8_4_8) {
                 className = "com.tencent.mobileqq.activity.aio.rebuild.TroopChatPie"
             }
             for (m: Method in className.methods) {
                 val argt = m.parameterTypes
                 if (m.name == ConfigTable.getConfig(HideTotalNumber::class.simpleName) && argt.isEmpty()) {
-                    m.hook(object : XC_MethodHook() {
-                        override fun beforeHookedMethod(param: MethodHookParam) {
-                            param.result = false
-                        }
-                    })
+                    m.hookBefore(this, hookFalse)
                 }
             }
             true

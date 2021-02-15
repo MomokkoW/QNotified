@@ -28,6 +28,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.widget.Button;
 
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 
@@ -39,7 +40,8 @@ import java.util.Map;
 import de.robv.android.xposed.XposedHelpers;
 import me.singleneuron.qn_kernel.data.HostInformationProviderKt;
 import nil.nadph.qnotified.util.ArscKit;
-import nil.nadph.qnotified.util.Nullable;
+
+import androidx.annotation.NonNull;
 
 import static nil.nadph.qnotified.util.Initiator.load;
 import static nil.nadph.qnotified.util.ReflexUtil.iget_object_or_null;
@@ -65,7 +67,7 @@ public class ResUtils {
     static private final Map<String, Drawable> cachedDrawable = new HashMap<>();
 
     public static void requireResourcesNonNull(Context ctx) {
-        if (ctx == null) ctx = HostInformationProviderKt.getHostInformationProvider().getApplicationContext();
+        if (ctx == null) ctx = HostInformationProviderKt.getHostInfo().getApplication();
         if (!inited) initTheme(ctx);
     }
 
@@ -313,7 +315,7 @@ public class ResUtils {
             String themeId = (String) invoke_static(load("com/tencent/mobileqq/theme/ThemeUtil"), "getUserCurrentThemeId", getAppRuntime(), load("mqq/app/AppRuntime"));
             return "1103".endsWith(themeId) || "2920".endsWith(themeId);
         } catch (Exception e) {
-            if (HostInformationProviderKt.getHostInformationProvider().isTim()) {
+            if (HostInformationProviderKt.getHostInfo().isTim()) {
                 return false;
             }
             log(e);

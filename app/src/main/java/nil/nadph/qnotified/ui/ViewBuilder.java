@@ -32,6 +32,8 @@ import android.widget.*;
 
 import androidx.core.view.ViewCompat;
 
+import cc.ioctl.H;
+import me.nextalone.hook.base.MultiItemDelayableHook;
 import me.singleneuron.qn_kernel.data.HostInformationProviderKt;
 import nil.nadph.qnotified.ExfriendManager;
 import nil.nadph.qnotified.MainHook;
@@ -43,6 +45,7 @@ import nil.nadph.qnotified.hook.BaseDelayableHook;
 import nil.nadph.qnotified.step.Step;
 import nil.nadph.qnotified.ui.widget.Switch;
 import nil.nadph.qnotified.util.NonUiThread;
+import nil.nadph.qnotified.util.Toasts;
 import nil.nadph.qnotified.util.Utils;
 
 import static android.widget.LinearLayout.LayoutParams.MATCH_PARENT;
@@ -141,7 +144,7 @@ public class ViewBuilder {
                     ConfigManager mgr = ConfigManager.getDefaultConfig();
                     mgr.getAllConfig().put(key, isChecked);
                     mgr.save();
-                    Utils.showToastShort(buttonView.getContext(), "重启" + HostInformationProviderKt.getHostInformationProvider().getHostName() + "生效");
+                    Utils.showToastShort(buttonView.getContext(), "重启" + HostInformationProviderKt.getHostInfo().getHostName() + "生效");
                 } catch (Throwable e) {
                     Utils.log(e);
                     Utils.showToastShort(buttonView.getContext(), e.toString());
@@ -180,7 +183,7 @@ public class ViewBuilder {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 try {
                     item.setEnabled(isChecked);
-                    Utils.showToastShort(buttonView.getContext(), "重启" + HostInformationProviderKt.getHostInformationProvider().getHostName() + "生效");
+                    Utils.showToastShort(buttonView.getContext(), "重启" + HostInformationProviderKt.getHostInfo().getHostName() + "生效");
                 } catch (Throwable e) {
                     Utils.log(e);
                     Utils.showToastShort(buttonView.getContext(), e.toString());
@@ -509,6 +512,36 @@ public class ViewBuilder {
         }
         root.setId(title.toString().hashCode());
         return root;
+    }
+
+    public static RelativeLayout newListItemButtonIfValid(Context ctx, CharSequence title, CharSequence desc,
+        CharSequence value, MultiItemDelayableHook hook) {
+        View.OnClickListener listener;
+        if (hook.isValid()) {
+            listener = hook.listener();
+        } else {
+            listener = (v -> Toasts.error(v.getContext(), "此功能暂不支持当前版本" + H.getAppName()));
+        }
+        return newListItemButton(ctx, title, desc, value, listener);
+    }
+
+    public static RelativeLayout newListItemButtonIfValid(Context ctx, CharSequence title, CharSequence desc,
+        CharSequence value, BaseDelayableHook hook, Class<?> activity) {
+        View.OnClickListener listener;
+        if (hook.isValid()) {
+            listener = clickToProxyActAction(activity);
+        } else {
+            listener = (v -> Toasts.error(v.getContext(), "此功能暂不支持当前版本" + H.getAppName()));
+        }
+        return newListItemButton(ctx, title, desc, value, listener);
+    }
+
+    public static RelativeLayout newListItemButtonIfValid(Context ctx, CharSequence title, CharSequence desc,
+        CharSequence value, BaseDelayableHook hook, View.OnClickListener listener) {
+        if (!hook.isValid()) {
+            listener = (v -> Toasts.error(v.getContext(), "此功能暂不支持当前版本" + H.getAppName()));
+        }
+        return newListItemButton(ctx, title, desc, value, listener);
     }
 
     public static LinearLayout subtitle(Context ctx, CharSequence title) {

@@ -1,14 +1,31 @@
+/* QNotified - An Xposed module for QQ/TIM
+ * Copyright (C) 2019-2021 xenonhydride@gmail.com
+ * https://github.com/ferredoxin/QNotified
+ *
+ * This software is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this software.  If not, see
+ * <https://www.gnu.org/licenses/>.
+ */
 package me.ketal.hook
 
 import android.app.Activity
 import android.content.Intent
 import android.view.View
 import android.widget.TextView
-import de.robv.android.xposed.XC_MethodHook
 import me.ketal.util.HookUtil.getMethod
-import me.ketal.util.HookUtil.hookMethod
+import me.nextalone.util.hookAfter
+import me.singleneuron.qn_kernel.data.requireMinQQVersion
 import me.singleneuron.util.QQVersion
-import nil.nadph.qnotified.H
 import nil.nadph.qnotified.SyncUtils
 import nil.nadph.qnotified.hook.CommonDelayableHook
 import nil.nadph.qnotified.step.DexDeobfStep
@@ -20,68 +37,52 @@ import nil.nadph.qnotified.util.Utils
 object SendFavoriteHook: CommonDelayableHook("ketal_send_favorite", SyncUtils.PROC_ANY, DexDeobfStep(DexKit.N_PluginProxyActivity__initPlugin)) {
     var isHooked: Boolean = false
 
-    override fun isValid(): Boolean {
-        return H.isQQ() && H.getVersionCode() >= QQVersion.QQ_8_0_0
-    }
+    override fun isValid(): Boolean = requireMinQQVersion(QQVersion.QQ_8_0_0)
 
     override fun initOnce(): Boolean {
-        try {
-            DexKit.doFindMethod(DexKit.N_PluginProxyActivity__initPlugin)
-                .hookMethod(object : XC_MethodHook() {
-                    override fun afterHookedMethod(param: MethodHookParam) {
-                        if (!isEnabled) return
-                        try {
-                            val context = param.thisObject as Activity
-                            val intent = context.intent
-                            if (intent.check()) {
-                                val classLoader = "Lcom/tencent/mobileqq/pluginsdk/PluginStatic;->getClassLoader(Ljava/lang/String;)Ljava/lang/ClassLoader;"
-                                    .getMethod()
-                                    ?.invoke(null, "qqfav.apk") as ClassLoader
-                                startHook(classLoader)
-                            }
-                        } catch (e: Exception) {
-                            Utils.log(e)
-                        }
+        return try {
+            DexKit.doFindMethod(DexKit.N_PluginProxyActivity__initPlugin)!!
+                .hookAfter(this) {
+                    val context = it.thisObject as Activity
+                    val intent = context.intent
+                    if (intent.check()) {
+                        val classLoader = "Lcom/tencent/mobileqq/pluginsdk/PluginStatic;->getClassLoader(Ljava/lang/String;)Ljava/lang/ClassLoader;"
+                            .getMethod()
+                            ?.invoke(null, "qqfav.apk") as ClassLoader
+                        startHook(classLoader)
                     }
-                })
-            return true
+                }
+            true
         } catch (e: Exception) {
             Utils.log(e)
-            return false
+             false
         }
     }
 
     private fun startHook(classLoader: ClassLoader) {
         "Lcom/qqfav/activity/FavoritesListActivity;->onCreate(Landroid/os/Bundle;)V"
             .getMethod(classLoader)
-            ?.hookMethod(object : XC_MethodHook() {
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    if (!isEnabled) return
+            ?.hookAfter(this) {
+                val thisObj = it.thisObject as Activity
+                isHooked = thisObj.intent.getBooleanExtra("bEnterToSelect", false)
+                if (!isHooked) return@hookAfter
+                val tv = findCancelTV(thisObj, "com.qqfav.activity.QfavBaseActivity".findClass(classLoader))
+                val logic = ReflexUtil.new_instance("com.qqfav.activity.FavoriteGroupLogic".findClass(classLoader),
+                    thisObj, tv, thisObj::class.java, View::class.java)
+                tv?.setOnClickListener {
                     try {
-                        val thisObj = param.thisObject as Activity
-                        isHooked = thisObj.intent.getBooleanExtra("bEnterToSelect", false)
-                        if (!isHooked) return
-                        val tv = findCancelTV(thisObj, "com.qqfav.activity.QfavBaseActivity".findClass(classLoader))
-                        val logic = ReflexUtil.new_instance("com.qqfav.activity.FavoriteGroupLogic".findClass(classLoader),
-                            thisObj, tv, thisObj::class.java, View::class.java)
-                        tv?.setOnClickListener {
-                            try {
-                                ReflexUtil.invoke_virtual(logic, "b")
-                                val b = ReflexUtil.iget_object_or_null(logic, "b", View::class.java)
-                                if (b.visibility != 0) {
-                                    ReflexUtil.invoke_virtual(logic, "a")
-                                } else {
-                                    ReflexUtil.invoke_virtual(logic, "a", true, Boolean::class.java)
-                                }
-                            } catch (e: Exception) {
-                                Utils.log(e)
-                            }
+                        ReflexUtil.invoke_virtual(logic, "b")
+                        val b = ReflexUtil.iget_object_or_null(logic, "b", View::class.java)
+                        if (b.visibility != 0) {
+                            ReflexUtil.invoke_virtual(logic, "a")
+                        } else {
+                            ReflexUtil.invoke_virtual(logic, "a", true, Boolean::class.java)
                         }
                     } catch (e: Exception) {
                         Utils.log(e)
                     }
                 }
-            })
+            }
     }
 
     private fun findCancelTV(thisObject: Any, clazz: Class<*>) : TextView? {

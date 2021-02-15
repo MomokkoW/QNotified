@@ -20,6 +20,8 @@ package nil.nadph.qnotified.hook;
 
 import androidx.annotation.NonNull;
 
+import cn.lliiooll.hook.AntiMessage;
+import cn.lliiooll.hook.MessageInterception;
 import com.rymmmmm.hook.BaseApk;
 import com.rymmmmm.hook.CustomDeviceModel;
 import com.rymmmmm.hook.CustomMsgTimeFormat;
@@ -36,6 +38,42 @@ import com.rymmmmm.hook.RemoveMiniProgramAd;
 import com.rymmmmm.hook.RemoveSendGiftAd;
 import com.rymmmmm.hook.ShowMsgCount;
 
+import cc.ioctl.hook.$endGiftHook;
+import cc.ioctl.hook.ArbitraryFrdSourceId;
+import cc.ioctl.hook.BlockFluxThief;
+import cc.ioctl.hook.CardMsgHook;
+import cc.ioctl.hook.ChatTailHook;
+import cc.ioctl.hook.CheatHook;
+import cc.ioctl.hook.DarkOverlayHook;
+import cc.ioctl.hook.DefaultBubbleHook;
+import cc.ioctl.hook.DelDetectorHook;
+import cc.ioctl.hook.EmoPicHook;
+import cc.ioctl.hook.FakeBatteryHook;
+import cc.ioctl.hook.FakeVipHook;
+import cc.ioctl.hook.FavMoreEmo;
+import cc.ioctl.hook.FileRecvRedirect;
+import cc.ioctl.hook.FlashPicHook;
+import cc.ioctl.hook.GagInfoDisclosure;
+import cc.ioctl.hook.HideGiftAnim;
+import cc.ioctl.hook.HideMiniAppPullEntry;
+import cc.ioctl.hook.InputButtonHook;
+import cc.ioctl.hook.InspectMessage;
+import cc.ioctl.hook.InterceptZipBomb;
+import cc.ioctl.hook.JumpController;
+import cc.ioctl.hook.MultiForwardAvatarHook;
+import cc.ioctl.hook.MuteAtAllAndRedPacket;
+import cc.ioctl.hook.MuteQZoneThumbsUp;
+import cc.ioctl.hook.PicMd5Hook;
+import cc.ioctl.hook.PreUpgradeHook;
+import cc.ioctl.hook.PttForwardHook;
+import cc.ioctl.hook.RepeaterHook;
+import cc.ioctl.hook.ReplyNoAtHook;
+import cc.ioctl.hook.RevokeMsgHook;
+import cc.ioctl.hook.RoundAvatarHook;
+import cc.ioctl.hook.ScriptEventHook;
+import cc.ioctl.hook.SettingEntryHook;
+import cc.ioctl.hook.ShowPicGagHook;
+import cc.ioctl.hook.VasProfileAntiCrash;
 import me.ketal.hook.HideAssistantRemoveTips;
 import me.ketal.hook.LeftSwipeReplyHook;
 import me.ketal.hook.MultiActionHook;
@@ -57,11 +95,15 @@ import me.kyuubiran.hook.SimplifyQQSettingMe;
 import me.kyuubiran.hook.testhook.CutMessage;
 import me.nextalone.hook.EnableQLog;
 import me.nextalone.hook.ForcedSendOriginalPhoto;
+import me.nextalone.hook.HideChatVipImage;
 import me.nextalone.hook.HideOnlineNumber;
+import me.nextalone.hook.HideOnlineStatus;
 import me.nextalone.hook.HideProfileBubble;
 import me.nextalone.hook.HideTotalNumber;
 import me.nextalone.hook.RemoveIntimateDrawer;
 import me.nextalone.hook.SimplifyChatLongItem;
+import me.nextalone.hook.SimplifyPlusPanel;
+import me.nextalone.hook.SimplifyQQSettings;
 import me.singleneuron.hook.ChangeDrawerWidth;
 import me.singleneuron.hook.DebugDump;
 import me.singleneuron.hook.ForceSystemAlbum;
@@ -178,6 +220,12 @@ public abstract class AbsDelayableHook implements SwitchConfigItem {
                 SendFavoriteHook.INSTANCE,
                 AutoRenewFire.INSTANCE,
                 SimplifyChatLongItem.INSTANCE,
+                HideOnlineStatus.INSTANCE,
+                HideChatVipImage.INSTANCE,
+                SimplifyQQSettings.INSTANCE,
+                SimplifyPlusPanel.INSTANCE,
+                MessageInterception.INSTANCE,
+                AntiMessage.INSTANCE,
             };
         }
         return sAllHooks;
