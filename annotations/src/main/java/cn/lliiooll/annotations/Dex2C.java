@@ -1,4 +1,5 @@
-/* QNotified - An Xposed module for QQ/TIM
+/*
+ * QNotified - An Xposed module for QQ/TIM
  * Copyright (C) 2019-2021 xenonhydride@gmail.com
  * https://github.com/ferredoxin/QNotified
  *
@@ -16,38 +17,15 @@
  * along with this software.  If not, see
  * <https://www.gnu.org/licenses/>.
  */
-package ltd.nextalone.util
 
-import nil.nadph.qnotified.util.Utils
+package cn.lliiooll.annotations;
 
-internal fun logd(msg: String) {
-    Utils.logd("NA: $msg")
-}
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-internal fun logThrowable(msg: Throwable) {
-    logd("Throwable: ${msg.stackTraceToString()}")
-}
-
-internal fun logDetail(info: String, msg: String = "") {
-    logd("$info--$msg")
-}
-
-internal fun logClass(msg: String = "") {
-    logd("Class--$msg")
-}
-
-internal fun logMethod(msg: String = "") {
-    logd("Method--$msg")
-}
-
-internal fun logStart(msg: String = "") {
-    logd("Start--$msg")
-}
-
-internal fun logBefore(msg: String = "") {
-    logd("Before--$msg")
-}
-
-internal fun logAfter(msg: String = "") {
-    logd("After--$msg")
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.CLASS)
+public @interface Dex2C {
 }

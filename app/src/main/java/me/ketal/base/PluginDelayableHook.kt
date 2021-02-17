@@ -1,4 +1,5 @@
-/* QNotified - An Xposed module for QQ/TIM
+/*
+ * QNotified - An Xposed module for QQ/TIM
  * Copyright (C) 2019-2021 xenonhydride@gmail.com
  * https://github.com/ferredoxin/QNotified
  *
@@ -16,28 +17,30 @@
  * along with this software.  If not, see
  * <https://www.gnu.org/licenses/>.
  */
-package ltd.nextalone.hook
 
-import android.view.View
-import ltd.nextalone.util.replaceNull
+package me.ketal.base
+
+import me.ketal.util.HookUtil.getMethod
+import me.singleneuron.qn_kernel.data.hostInfo
+import nil.nadph.qnotified.BuildConfig
+import nil.nadph.qnotified.SyncUtils
 import nil.nadph.qnotified.hook.CommonDelayableHook
-import nil.nadph.qnotified.util.DexKit
 import nil.nadph.qnotified.util.Utils
-import java.lang.reflect.Method
 
-object RemoveIntimateDrawer : CommonDelayableHook("kr_remove_intimate_drawer") {
+abstract  class PluginDelayableHook(keyName: String) : CommonDelayableHook(keyName, SyncUtils.PROC_ANY) {
+    abstract val pluginID: String
 
-    override fun initOnce(): Boolean {
-        return try {
-            for (m: Method in DexKit.doFindClass(DexKit.C_IntimateDrawer)!!.declaredMethods) {
-                if (m.name == "a" && m.returnType == View::class.java) {
-                    m.replaceNull(this)
-                }
-            }
-            true
-        } catch (t: Throwable) {
+    abstract fun startHook(classLoader: ClassLoader) : Boolean
+
+    override fun initOnce() = try {
+        val classLoader = "Lcom/tencent/mobileqq/pluginsdk/PluginStatic;->getOrCreateClassLoader(Landroid/content/Context;Ljava/lang/String;)Ljava/lang/ClassLoader;"
+            .getMethod()
+            ?.invoke(null, hostInfo.application, pluginID) as ClassLoader
+        startHook(classLoader)
+    } catch (t: Throwable) {
+        if (BuildConfig.DEBUG) {
             Utils.log(t)
-            false
         }
+        false
     }
 }

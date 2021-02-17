@@ -31,7 +31,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
-import androidx.core.text.HtmlCompat;
 import androidx.core.view.ViewCompat;
 
 import cn.lliiooll.hook.AntiMessage;
@@ -63,9 +62,12 @@ import cc.ioctl.hook.ReplyNoAtHook;
 import cc.ioctl.hook.RevokeMsgHook;
 import cc.ioctl.hook.RoundAvatarHook;
 import cc.ioctl.hook.ShowPicGagHook;
+import ltd.nextalone.hook.ChatWordsCount;
 import me.ketal.activity.ModifyLeftSwipeReplyActivity;
 import me.ketal.hook.LeftSwipeReplyHook;
 import me.ketal.hook.MultiActionHook;
+import me.ketal.hook.QWalletNoAD;
+import me.ketal.hook.QZoneNoAD;
 import me.ketal.hook.SendFavoriteHook;
 import me.ketal.hook.SortAtPanel;
 import me.kyuubiran.hook.AutoMosaicName;
@@ -79,7 +81,6 @@ import me.singleneuron.hook.decorator.DisableQzoneSlideCamera;
 import me.singleneuron.hook.decorator.SimpleReceiptMessage;
 import me.singleneuron.qn_kernel.data.HostInformationProviderKt;
 import me.singleneuron.util.KotlinUtilsKt;
-import nil.nadph.qnotified.ExfriendManager;
 import nil.nadph.qnotified.MainHook;
 import nil.nadph.qnotified.R;
 import nil.nadph.qnotified.config.ConfigItems;
@@ -93,7 +94,6 @@ import nil.nadph.qnotified.util.*;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-import static androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY;
 import static me.singleneuron.util.KotlinUtilsKt.addViewConditionally;
 import static me.singleneuron.util.QQVersion.QQ_8_2_6;
 import static nil.nadph.qnotified.ui.ViewBuilder.*;
@@ -105,7 +105,7 @@ public class SettingsActivity extends IphoneTitleBarActivityCompat implements Ru
     private static final int R_ID_BTN_FILE_RECV = 0x300AFF91;
     private static final String qn_enable_fancy_rgb = "qn_enable_fancy_rgb";
 
-    private TextView __tv_muted_atall, __tv_muted_redpacket, __tv_fake_bat_status, __recv_status, __recv_desc, __jmp_ctl_cnt;
+    private TextView __tv_fake_bat_status, __recv_status, __recv_desc, __jmp_ctl_cnt;
 
     @Override
     public boolean doOnCreate(Bundle bundle) {
@@ -186,14 +186,6 @@ public class SettingsActivity extends IphoneTitleBarActivityCompat implements Ru
         ll.addView(newListItemHookSwitchInit(this, "禁用$打开送礼界面", "禁止聊天时输入$自动弹出[选择赠送对象]窗口", $endGiftHook.get()));
         ll.addView(subtitle(this, "消息通知设置(不影响接收消息)屏蔽后可能仍有[橙字],但通知栏不会有通知,赞说说不提醒仅屏蔽通知栏的通知"));
         ll.addView(subtitle(this, "    注:屏蔽后可能仍有[橙字],但不会有通知"));
-        ll.addView(_t = newListItemButton(this, "屏蔽指定群@全体成员通知", HtmlCompat.fromHtml("<font color='"
-                + get_RGB(hiColor.getDefaultColor()) + "'>[@全体成员]</font>就这点破事", FROM_HTML_MODE_LEGACY), "%d个群",
-            v -> TroopSelectActivity.startToSelectTroopsAndSaveToExfMgr(SettingsActivity.this, ConfigItems.qn_muted_at_all, "屏蔽@全体成员")));
-        __tv_muted_atall = _t.findViewById(R_ID_VALUE);
-        ll.addView(_t = newListItemButton(this, "屏蔽指定群的红包通知", HtmlCompat.fromHtml("<font color='"
-                + get_RGB(hiColor.getDefaultColor()) + "'>[QQ红包][有红包]</font>恭喜发财", FROM_HTML_MODE_LEGACY), "%d个群",
-            v -> TroopSelectActivity.startToSelectTroopsAndSaveToExfMgr(SettingsActivity.this, ConfigItems.qn_muted_red_packet, "屏蔽群红包")));
-        __tv_muted_redpacket = _t.findViewById(R_ID_VALUE);
         ll.addView(newListItemHookSwitchInit(this, "被赞说说不提醒", "不影响评论,转发或击掌的通知", MuteQZoneThumbsUp.get()));
         ll.addView(newListItemHookSwitchInit(this, "转发消息点头像查看详细信息", "仅限合并转发的消息", MultiForwardAvatarHook.get()));
         if (!HostInformationProviderKt.getHostInfo().isTim()) {
@@ -229,13 +221,16 @@ public class SettingsActivity extends IphoneTitleBarActivityCompat implements Ru
         ll.addView(newListItemHookSwitchInit(this, "屏蔽QQ空间滑动相机", null, DisableQzoneSlideCamera.INSTANCE));
         ll.addView(newListItemHookSwitchInit(this, "回执消息文本化", null, SimpleReceiptMessage.INSTANCE));
         ll.addView(newListItemButtonIfValid(this, "屏蔽指定类型消息", null, null, AntiMessage.INSTANCE));
-        ll.addView(newListItemButtonIfValid(this, "精简聊天气泡长按菜单", null, null, SimplifyChatLongItem.INSTANCE));
+        ll.addView(newListItemButtonIfValid(this, "聊天字数统计", null, null, ChatWordsCount.INSTANCE, v -> ChatWordsCount.INSTANCE.showChatWordsCountDialog(this)));
+        ll.addView(newListItemButtonIfValid(this, "精简聊天气泡长按菜单", null, null, SimplifyChatLongItem.INSTANCE, SimplifyChatLongItem.INSTANCE.listener()));
         ll.addView(newListItemButtonIfValid(this, "精简加号菜单", null, null, SimplifyPlusPanel.INSTANCE));
         ll.addView(newListItemButtonIfValid(this, "精简设置菜单", null, null, SimplifyQQSettings.INSTANCE));
         ll.addView(newListItemHookSwitchInit(this, "批量撤回消息", "多选消息后撤回", MultiActionHook.INSTANCE));
-        ll.addView(newListItemButtonIfValid(this, "修改消息左滑动作", "", null, LeftSwipeReplyHook.INSTANCE, ModifyLeftSwipeReplyActivity.class));
+        ll.addView(newListItemButtonIfValid(this, "修改消息左滑动作", null, null, LeftSwipeReplyHook.INSTANCE, ModifyLeftSwipeReplyActivity.class));
         ll.addView(newListItemConfigSwitchIfValid(this, "修改@界面排序", "排序由群主管理员至正常人员", SortAtPanel.INSTANCE));
-        ll.addView(newListItemConfigSwitchIfValid(this, "发送收藏消息添加分组", "", SendFavoriteHook.INSTANCE));
+        ll.addView(newListItemConfigSwitchIfValid(this, "发送收藏消息添加分组", null, SendFavoriteHook.INSTANCE));
+        ll.addView(newListItemConfigSwitchIfValid(this, "隐藏空间好友热播和广告", null, QZoneNoAD.INSTANCE));
+        ll.addView(newListItemConfigSwitchIfValid(this, "隐藏QQ钱包超值精选", null, QWalletNoAD.INSTANCE));
         ll.addView(subtitle(this, "好友列表"));
         ll.addView(newListItemButton(this, "打开资料卡", "打开指定用户的资料卡", null, new View.OnClickListener() {
             @Override
@@ -362,14 +357,6 @@ public class SettingsActivity extends IphoneTitleBarActivityCompat implements Ru
         super.doOnResume();
         ConfigManager cfg = ConfigManager.getDefaultConfig();//改这里的话可能会引发其他问题，所以只把红包和全体改了
         rgbEnabled = cfg.getBooleanOrFalse(qn_enable_fancy_rgb);
-        String str = ExfriendManager.getCurrent().getConfig().getString(ConfigItems.qn_muted_at_all);
-        int n = 0;
-        if (str != null && str.length() > 4) n = str.split(",").length;
-        __tv_muted_atall.setText(n + "个群");
-        str = ExfriendManager.getCurrent().getConfig().getString(ConfigItems.qn_muted_red_packet);
-        n = 0;
-        if (str != null && str.length() > 4) n = str.split(",").length;
-        __tv_muted_redpacket.setText(n + "个群");
         if (__tv_fake_bat_status != null) {
             FakeBatteryHook bat = FakeBatteryHook.get();
             if (bat.isEnabled()) {
