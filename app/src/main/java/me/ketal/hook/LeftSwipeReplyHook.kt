@@ -1,20 +1,23 @@
-/* QNotified - An Xposed module for QQ/TIM
- * Copyright (C) 2019-2021 xenonhydride@gmail.com
+/*
+ * QNotified - An Xposed module for QQ/TIM
+ * Copyright (C) 2019-2021 dmca@ioctl.cc
  * https://github.com/ferredoxin/QNotified
  *
- * This software is free software: you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
+ * This software is non-free but opensource software: you can redistribute it
+ * and/or modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; either
- * version 3 of the License, or (at your option) any later version.
+ * version 3 of the License, or any later version and our eula as published
+ * by ferredoxin.
  *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this software.  If not, see
- * <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License
+ * and eula along with this software.  If not, see
+ * <https://www.gnu.org/licenses/>
+ * <https://github.com/ferredoxin/QNotified/blob/master/LICENSE.md>.
  */
 package me.ketal.hook
 
@@ -23,6 +26,7 @@ import android.graphics.BitmapFactory
 import android.os.Looper
 import android.view.View
 import android.widget.ImageView
+import de.robv.android.xposed.XposedHelpers
 import me.ketal.util.TIMVersion
 import ltd.nextalone.util.hookAfter
 import ltd.nextalone.util.hookBefore
@@ -41,7 +45,6 @@ object LeftSwipeReplyHook: CommonDelayableHook("ketal_left_swipe_action", DexDeo
     private const val LEFT_SWIPE_NO_ACTION = "ketal_left_swipe_noAction"
     private const val LEFT_SWIPE_MULTI_CHOOSE = "ketal_left_swipe_multiChoose"
     private const val LEFT_SWIPE_REPLY_DISTANCE = "ketal_left_swipe_replyDistance"
-    private const val FLAG_REPLACE_PIC = 10001
     private var img: Bitmap? = null
     private val multiBitmap: Bitmap?
         get() {
@@ -56,7 +59,7 @@ object LeftSwipeReplyHook: CommonDelayableHook("ketal_left_swipe_action", DexDeo
             val replyMethod = DexKit.doFindMethod(DexKit.N_LeftSwipeReply_Helper__reply)
             val hookClass = replyMethod!!.declaringClass
             var methodName = if (hostInfo.isTim) "L" else "a"
-            ReflexUtil.hasMethod(hookClass, methodName, Float::class.java, Float::class.java)
+            XposedHelpers.findMethodBestMatch(hookClass, methodName, Float::class.java, Float::class.java)
                 .hookBefore(this) {
                     if (isNoAction) it.result = null
                 }
@@ -64,9 +67,9 @@ object LeftSwipeReplyHook: CommonDelayableHook("ketal_left_swipe_action", DexDeo
                 .hookBefore(this) {
                     if (!isMultiChose) return@hookBefore
                     val iv = it.args[0] as ImageView
-                    if (iv.getTag(FLAG_REPLACE_PIC) == null) {
+                    if (iv.tag == null) {
                         iv.setImageBitmap(multiBitmap)
-                        iv.setTag(FLAG_REPLACE_PIC, true)
+                        iv.tag = true
                     }
                 }
             replyMethod.hookBefore(this) {
