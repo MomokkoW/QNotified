@@ -26,18 +26,8 @@ jobs:
     - name: Load upstream commits
       run:
         git config pull.rebase true
-        git pull https://github.com/ferredoxin/QNotified.git master --log --rebase
-    - name: Apply commit changes
-      run: |
-        if [ -f ./.git/MERGE_MSG ]; then
-        mkdir ./tmp && cp ./.git/MERGE_MSG ./tmp/message
-        sed -i "1c [bot] AutoMerging: merge all upstream's changes:" ./tmp/message
-        sed -i '/^\#.*/d' ./tmp/message
-        # git commit --file="./tmp/message"
-        else
-        echo "There is no merge commits."
-        fi
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.PAT}}
+        
+        git pull https://github.com/ferredoxin/QNotified.git master --rebase
+
+        git push -f
+
