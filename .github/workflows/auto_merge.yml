@@ -25,9 +25,7 @@ jobs:
         git config --global user.name "github-actions[bot]"
     - name: Load upstream commits
       run:
-        git config pull.rebase true
-        
-        git pull https://github.com/ferredoxin/QNotified.git master --rebase
+        git pull https://github.com/ferredoxin/QNotified.git master --ff
 
         git push -f
 
