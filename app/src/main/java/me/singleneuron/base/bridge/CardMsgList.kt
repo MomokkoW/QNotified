@@ -31,7 +31,7 @@ abstract class CardMsgList {
 
         @JvmStatic
         @NonNull
-        fun getInstance(): ()->String {
+        fun getInstance(): () -> String {
             //Todo
             return ::getBlackListFormGithub
         }

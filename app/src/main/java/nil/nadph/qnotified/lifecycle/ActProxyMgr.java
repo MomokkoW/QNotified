@@ -22,6 +22,7 @@
 package nil.nadph.qnotified.lifecycle;
 
 import androidx.annotation.NonNull;
+import nil.nadph.qnotified.activity.IphoneTitleBarActivityCompat;
 import org.intellij.lang.annotations.MagicConstant;
 
 /**
@@ -48,17 +49,21 @@ public class ActProxyMgr {
             || className.startsWith("cc.ioctl.activity.")
             || className.startsWith("me.zpp0196.qqpurify.activity.")
             || className.startsWith("me.singleneuron.")
-            || className.startsWith("me.ketal.activity.")
+            || className.startsWith("me.ketal.ui.activity.")
             || className.startsWith("com.rymmmmm.activity.")
             || className.startsWith("cn.lliiooll.activity.")
             || className.startsWith("ltd.nextalone.activity.");
     }
 
-    public static boolean isResourceInjectionRequired(@NonNull String className) {
-        if (className == null) {
+    public static boolean isModuleBundleClassLoaderRequired(@NonNull String className) {
+        if (!isModuleProxyActivity(className)) {
             return false;
         }
-        return className.startsWith("me.zpp0196.qqpurify.activity.")
-            || className.startsWith("me.singleneuron.");
+        try {
+            Class<?> clazz = Class.forName(className);
+            return !IphoneTitleBarActivityCompat.class.isAssignableFrom(clazz);
+        } catch (ClassNotFoundException cnfe) {
+            return false;
+        }
     }
 }

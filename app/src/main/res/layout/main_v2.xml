@@ -29,53 +29,62 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/mainV2_activationStatusLinearLayout"
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/bg_yellow_solid"
-                android:orientation="horizontal"
-                android:paddingLeft="0dp"
-                android:paddingTop="18dp"
-                android:paddingRight="0dp"
-                android:paddingBottom="18dp">
-
-                <ImageView
-                    android:id="@+id/mainV2_activationStatusIcon"
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginRight="16dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/ic_check_circle" />
+                android:background="@drawable/ic_bg_gradient"
+                android:gravity="center">
 
                 <LinearLayout
+
+                    android:id="@+id/mainV2_activationStatusLinearLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_margin="16dp"
+                    android:background="@drawable/bg_yellow_solid"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:paddingLeft="0dp"
+                    android:paddingTop="18dp"
+                    android:paddingRight="0dp"
+                    android:paddingBottom="18dp">
 
-                    <TextView
-                        android:id="@+id/mainV2_activationStatusTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="0dp"
-                        android:text="N/A"
-                        android:textColor="@color/whiteTextColor"
-                        android:textSize="18sp" />
+                    <ImageView
+                        android:id="@+id/mainV2_activationStatusIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_check_circle" />
 
-                    <TextView
-                        android:id="@+id/mainV2_activationStatusDesc"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingTop="2dp"
-                        android:text="Internal error"
-                        android:textColor="@color/whiteTextColor"
-                        android:textSize="14sp" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/mainV2_activationStatusTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="0dp"
+                            android:text="N/A"
+                            android:textColor="@color/whiteTextColor"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/mainV2_activationStatusDesc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="2dp"
+                            android:text="Internal error"
+                            android:textColor="@color/whiteTextColor"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -84,11 +93,13 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
                 android:layout_marginBottom="16dp"
-                android:background="@drawable/bg_trans_border_ripple"
+                android:background="@drawable/ic_bg_white"
                 android:clickable="true"
                 android:focusable="true"
-                android:gravity="start|top"
                 android:orientation="horizontal"
                 android:paddingLeft="0dp"
                 android:paddingTop="18dp"
@@ -96,15 +107,15 @@
                 android:paddingBottom="18dp">
 
                 <ImageView
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_marginLeft="16dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="8dp"
                     android:layout_marginRight="16dp"
                     android:layout_marginBottom="16dp"
-                    android:scaleType="fitXY"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/ic_info"
-                    app:tint="@color/themeColor" />
+                    app:tint="@color/themeIconColor" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -115,9 +126,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="0dp"
-                        android:text="模块版本"
+                        android:text="@string/ModuleVersion"
                         android:textColor="@color/firstTextColor"
-                        android:textSize="18sp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:id="@+id/mainTextViewVersion"
@@ -126,15 +137,15 @@
                         android:paddingTop="2dp"
                         android:text="N/A"
                         android:textColor="@color/secondTextColor"
-                        android:textSize="14sp" />
+                        android:textSize="12sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingTop="4dp"
-                        android:text="更新模块后需要重启手机方可生效"
+                        android:text="@string/ModuleVersion_tip"
                         android:textColor="@color/thirdTextColor"
-                        android:textSize="14sp" />
+                        android:textSize="12sp" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -142,11 +153,13 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
                 android:layout_marginBottom="16dp"
-                android:background="@drawable/bg_trans_border_ripple"
+                android:background="@drawable/ic_bg_white"
                 android:clickable="true"
                 android:focusable="true"
-                android:gravity="start|top"
                 android:orientation="horizontal"
                 android:paddingLeft="0dp"
                 android:paddingTop="18dp"
@@ -154,14 +167,14 @@
                 android:paddingBottom="18dp">
 
                 <ImageView
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_marginLeft="16dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="8dp"
                     android:layout_marginRight="16dp"
-                    android:scaleType="fitXY"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/ic_settings"
-                    app:tint="@color/themeColor" />
+                    app:tint="@color/themeIconColor" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -172,33 +185,33 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="0dp"
-                        android:text="模块设置"
+                        android:text="@string/ModuleSetting"
                         android:textColor="@color/firstTextColor"
-                        android:textSize="18sp" />
+                        android:textSize="16sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingTop="2dp"
-                        android:text="请在 QQ / TIM 内进行操作"
+                        android:text="@string/ModuleSetting_tip_1"
                         android:textColor="@color/secondTextColor"
-                        android:textSize="14sp" />
+                        android:textSize="12sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingTop="4dp"
-                        android:text="QQ侧滑 > 设置 > QNotified 即可进入模块设置"
+                        android:text="@string/ModuleSetting_tip_2"
                         android:textColor="@color/thirdTextColor"
-                        android:textSize="14sp" />
+                        android:textSize="12sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingTop="4dp"
-                        android:text="暂不支持 轻聊版 / 国际版"
+                        android:text="@string/ModuleSetting_tip_3"
                         android:textColor="@color/thirdTextColor"
-                        android:textSize="14sp" />
+                        android:textSize="12sp" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -218,15 +231,15 @@
                             android:paddingTop="2dp"
                             android:paddingRight="0dp"
                             android:paddingBottom="2dp"
-                            android:text="QQ"
-                            android:textColor="@color/themeColor"
-                            android:textSize="18sp" />
+                            android:text="@string/qq"
+                            android:textColor="@color/themeIconColor"
+                            android:textSize="16sp" />
 
                         <TextView
                             android:id="@+id/mainRelativeLayoutButtonOpenTIM"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="16dp"
+                            android:layout_marginStart="16dp"
                             android:background="@color/nullColor"
                             android:gravity="center"
                             android:onClick="openModuleSettingForHost"
@@ -234,10 +247,25 @@
                             android:paddingTop="2dp"
                             android:paddingRight="0dp"
                             android:paddingBottom="2dp"
-                            android:text="TIM"
-                            android:textColor="@color/themeColor"
-                            android:textSize="18sp" />
+                            android:text="@string/tim"
+                            android:textColor="@color/themeIconColor"
+                            android:textSize="16sp" />
 
+                        <TextView
+                            android:id="@+id/mainRelativeLayoutButtonOpenQQLite"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="24dp"
+                            android:background="@color/nullColor"
+                            android:gravity="center"
+                            android:onClick="openModuleSettingForHost"
+                            android:paddingLeft="0dp"
+                            android:paddingTop="2dp"
+                            android:paddingRight="0dp"
+                            android:paddingBottom="2dp"
+                            android:text="@string/qq_lite"
+                            android:textColor="@color/themeIconColor"
+                            android:textSize="16sp" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -248,11 +276,14 @@
                 android:id="@+id/mainV2_githubRepo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/bg_trans_border_null_ripple"
                 android:clickable="true"
                 android:focusable="true"
-                android:gravity="start|top"
+                android:gravity="center"
                 android:onClick="handleClickEvent"
                 android:orientation="horizontal"
                 android:paddingLeft="0dp"
@@ -261,12 +292,12 @@
                 android:paddingBottom="18dp">
 
                 <ImageView
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_marginLeft="16dp"
                     android:layout_marginTop="0dp"
                     android:layout_marginRight="16dp"
-                    android:scaleType="fitXY"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/ic_github"
                     app:tint="@color/secondTextColor" />
 
@@ -279,9 +310,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="0dp"
-                        android:text="Github"
+                        android:text="@string/github"
                         android:textColor="@color/firstTextColor"
-                        android:textSize="18sp" />
+                        android:textSize="16sp" />
 
 
                 </LinearLayout>
@@ -292,11 +323,14 @@
                 android:id="@+id/mainV2_help"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/bg_trans_border_null_ripple"
                 android:clickable="true"
                 android:focusable="true"
-                android:gravity="start|top"
+                android:gravity="center"
                 android:onClick="handleClickEvent"
                 android:orientation="horizontal"
                 android:paddingLeft="0dp"
@@ -309,7 +343,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
-                    android:scaleType="fitXY"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/ic_help"
                     app:tint="@color/secondTextColor" />
 
@@ -322,9 +356,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="0dp"
-                        android:text="提示"
+                        android:text="@string/tip"
                         android:textColor="@color/firstTextColor"
-                        android:textSize="18sp" />
+                        android:textSize="16sp" />
 
                 </LinearLayout>
 

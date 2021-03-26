@@ -43,11 +43,11 @@ import me.singleneuron.base.Conditional
 import me.singleneuron.base.bridge.CardMsgList
 import me.singleneuron.data.CardMsgCheckResult
 import nil.nadph.qnotified.BuildConfig
-import nil.nadph.qnotified.MainHook
 import nil.nadph.qnotified.R
 import nil.nadph.qnotified.activity.EulaActivity
 import nil.nadph.qnotified.activity.OmegaTestFuncActivity
 import nil.nadph.qnotified.hook.BaseDelayableHook
+import nil.nadph.qnotified.hook.CommonDelayableHook
 import nil.nadph.qnotified.ui.ViewBuilder.newListItemHookSwitchInit
 import nil.nadph.qnotified.util.LicenseStatus
 import nil.nadph.qnotified.util.Utils
@@ -61,8 +61,22 @@ fun ViewGroup.addViewConditionally(view: View, condition: Boolean) {
     }
 }
 
-fun <T> ViewGroup.addViewConditionally(context: Context, title: String, desc: String, hook: T) where T : BaseDelayableHook, T : Conditional {
+fun <T> ViewGroup.addViewConditionally(
+    context: Context,
+    title: String,
+    desc: String,
+    hook: T
+) where T : BaseDelayableHook, T : Conditional {
     addViewConditionally(newListItemHookSwitchInit(context, title, desc, hook), hook.condition)
+}
+
+fun ViewGroup.addViewConditionally(
+    context: Context,
+    title: String,
+    desc: String,
+    hook: CommonDelayableHook
+) {
+    addViewConditionally(newListItemHookSwitchInit(context, title, desc, hook), hook.isValid)
 }
 
 @Throws(IOException::class)
@@ -91,10 +105,17 @@ fun checkCardMsg(originString: String): CardMsgCheckResult {
         val string = decodePercent(originString)
         Utils.logd("decode string: $string")
         val blackListString = CardMsgList.getInstance().invoke()
-        val blackList = Gson().fromJson<HashMap<String, String>>(blackListString, object : TypeToken<HashMap<String, String>>() {}.type)
+        val blackList = Gson().fromJson<HashMap<String, String>>(
+            blackListString,
+            object : TypeToken<HashMap<String, String>>() {}.type
+        )
         Utils.logd(Gson().toJson(blackList))
         for (rule in blackList) {
-            if (Regex(rule.value, setOf(RegexOption.IGNORE_CASE,RegexOption.DOT_MATCHES_ALL)).containsMatchIn(string)) {
+            if (Regex(
+                    rule.value,
+                    setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL)
+                ).containsMatchIn(string)
+            ) {
                 return CardMsgCheckResult(false, rule.key)
             }
         }
@@ -105,18 +126,18 @@ fun checkCardMsg(originString: String): CardMsgCheckResult {
     }
 }
 
-private fun decodePercent(string:String): String {
+private fun decodePercent(string: String): String {
     var produceString = string
-    val regex = Regex("""%[0-9a-fA-F]{2}""",RegexOption.IGNORE_CASE)
+    val regex = Regex("""%[0-9a-fA-F]{2}""", RegexOption.IGNORE_CASE)
     while (true) {
         if (!regex.containsMatchIn(produceString)) return produceString
-        produceString = regex.replace(produceString){matchResult ->
+        produceString = regex.replace(produceString) { matchResult ->
             val hex = matchResult.value.substring(1)
             try {
-                val char = Integer.valueOf(hex,16).toChar().toString()
+                val char = Integer.valueOf(hex, 16).toChar().toString()
                 Utils.logd("replace $hex -> $char")
                 return@replace char
-            } catch (e:Exception) {
+            } catch (e: Exception) {
                 Utils.log(e)
                 return@replace hex
             }
@@ -127,13 +148,14 @@ private fun decodePercent(string:String): String {
 
 fun showEulaDialog(activity: Activity) {
     if (BuildConfig.DEBUG) {
-        MainHook.startProxyActivity(activity,OmegaTestFuncActivity::class.java)
+        activity.startActivity(Intent(activity, OmegaTestFuncActivity::class.java))
         return
     }
     val linearLayout = LinearLayout(activity)
     linearLayout.orientation = LinearLayout.VERTICAL
     val textView = TextView(activity)
-    textView.text = "为避免该功能被滥用,在您每次进入该功能时将会弹出该弹窗,请勿试图用各种办法绕过 \n在您使用 发送卡片消息 及 群发文本消息 时，本模块会向服务器报告您使用此功能时发送的消息内容以及当前QQ号。\n继续使用 群发 或 卡片消息 功能代表您同意放弃自己的一切权利，并允许QNotified开发组及管理组在非匿名的前提下任意存储、分析、使用、分享您的数据。如您不同意，请立刻退出。\n请您在使用此功能时自觉遵守您所在地区的法律法规，开发者不为您使用此功能产生的后果承担任何责任，并保留在必要的时候配合执法机构调查的权利。"
+    textView.text =
+        "为避免该功能被滥用,在您每次进入该功能时将会弹出该弹窗,请勿试图用各种办法绕过 \n在您使用 发送卡片消息 及 群发文本消息 时，本模块会向服务器报告您使用此功能时发送的消息内容以及当前QQ号。\n继续使用 群发 或 卡片消息 功能代表您同意放弃自己的一切权利，并允许QNotified开发组及管理组在非匿名的前提下任意存储、分析、使用、分享您的数据。如您不同意，请立刻退出。\n请您在使用此功能时自觉遵守您所在地区的法律法规，开发者不为您使用此功能产生的后果承担任何责任，并保留在必要的时候配合执法机构调查的权利。"
     textView.setTextColor(Color.RED)
     val editText = EditText(activity)
     editText.isEnabled = false
@@ -174,12 +196,17 @@ fun showEulaDialog(activity: Activity) {
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
-        } while (--time!=0)
+        } while (--time != 0)
         Utils.runOnUiThread {
             button.text = "确定"
             editText.isEnabled = true
             editText.visibility = View.VISIBLE
+<<<<<<< HEAD
             textView.text = textView.text.toString() + "\nLOL 输入1即可 别问为什么 问就是你懂得"
+=======
+            textView.text =
+                textView.text.toString() + "\n若继续进入该功能,请在下方输入框中输入 我已阅读并同意用户协议 ,退出该页面请点取消"
+>>>>>>> 61f49debf077fdca7d67f9b70af1f472b7ebd3d1
             if (LicenseStatus.isInsider()) {
                 editText.setText("1")
             }

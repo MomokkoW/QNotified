@@ -24,6 +24,7 @@ package me.kyuubiran.hook
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import me.singleneuron.qn_kernel.tlb.ConfigTable
+import nil.nadph.qnotified.base.annotation.FunctionEntry
 import nil.nadph.qnotified.hook.CommonDelayableHook
 import nil.nadph.qnotified.util.Initiator._BaseChatPie
 import nil.nadph.qnotified.util.LicenseStatus
@@ -31,13 +32,17 @@ import nil.nadph.qnotified.util.Utils
 import java.lang.reflect.Method
 
 //聊天界面顶栏群名字/好友昵称自动打码
+@FunctionEntry
 object AutoMosaicName : CommonDelayableHook("kr_automatic_mosaic_name") {
 
     override fun initOnce(): Boolean {
         return try {
             for (m: Method in _BaseChatPie().declaredMethods) {
                 val argt = m.parameterTypes
-                if (argt.size == 1 && argt[0] == Boolean::class.java && m.name == ConfigTable.getConfig(AutoMosaicName::class.java.simpleName)) {
+                if (argt.size == 1 && argt[0] == Boolean::class.java && m.name == ConfigTable.getConfig(
+                        AutoMosaicName::class.java.simpleName
+                    )
+                ) {
                     XposedBridge.hookMethod(m, object : XC_MethodHook() {
                         override fun beforeHookedMethod(param: MethodHookParam) {
                             if (LicenseStatus.sDisableCommonHooks) return

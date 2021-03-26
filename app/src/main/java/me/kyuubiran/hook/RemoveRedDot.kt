@@ -27,6 +27,7 @@ import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import me.kyuubiran.util.getMethods
 import me.kyuubiran.util.putObject
+import nil.nadph.qnotified.base.annotation.FunctionEntry
 import nil.nadph.qnotified.hook.CommonDelayableHook
 import nil.nadph.qnotified.util.LicenseStatus
 import nil.nadph.qnotified.util.Utils
@@ -34,6 +35,7 @@ import java.lang.reflect.Method
 
 
 //移除小红点
+@FunctionEntry
 object RemoveRedDot : CommonDelayableHook("kr_remove_red_dot") {
     private val TRANSPARENT_PNG = byteArrayOf(
         0x89.toByte(), 0x50.toByte(), 0x4E.toByte(), 0x47.toByte(), 0x0D.toByte(), 0x0A.toByte(),
@@ -63,7 +65,11 @@ object RemoveRedDot : CommonDelayableHook("kr_remove_red_dot") {
                             putObject(
                                 param.result,
                                 "a",
-                                BitmapFactory.decodeByteArray(TRANSPARENT_PNG, 0, TRANSPARENT_PNG.size),
+                                BitmapFactory.decodeByteArray(
+                                    TRANSPARENT_PNG,
+                                    0,
+                                    TRANSPARENT_PNG.size
+                                ),
                                 Bitmap::class.java
                             )
                         }

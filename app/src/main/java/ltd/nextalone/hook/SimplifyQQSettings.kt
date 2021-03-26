@@ -24,40 +24,31 @@ package ltd.nextalone.hook
 import android.app.Activity
 import android.view.View
 import ltd.nextalone.base.MultiItemDelayableHook
-import ltd.nextalone.util.hide
-import ltd.nextalone.util.hookAfter
-import ltd.nextalone.util.method
-import ltd.nextalone.util.replaceNull
-import me.singleneuron.qn_kernel.data.requireMinQQVersion
-import me.singleneuron.util.QQVersion
-import nil.nadph.qnotified.util.Utils
+import ltd.nextalone.util.*
+import nil.nadph.qnotified.base.annotation.FunctionEntry
 
-object SimplifyQQSettings : MultiItemDelayableHook("na_simplify_qq_settings", "保留") {
-    override val allItems = "手机号码|达人|安全|通知|记录|隐私|通用|辅助|免流量|关于".split("|").toMutableList()
-    override val defaultItems = "手机号码|达人|安全|通知|隐私|通用|辅助|关于"
+@FunctionEntry
+object SimplifyQQSettings : MultiItemDelayableHook("na_simplify_qq_settings_multi") {
+    override val allItems = "手机号码|达人|安全|通知|记录|隐私|通用|辅助|免流量|关于"
+    override val defaultItems = ""
 
-    override fun initOnce() = try {
+    override fun initOnce() = tryOrFalse {
         "Lcom/tencent/mobileqq/activity/QQSettingSettingActivity;->a(IIII)V".method.hookAfter(this) {
             val activity = it.thisObject as Activity
             val viewId: Int = it.args[0].toString().toInt()
             val strId: Int = it.args[1].toString().toInt()
             val view = activity.findViewById<View>(viewId)
             val str = activity.getString(strId)
-            if (activeItems.all { string ->
-                    string !in str
+            if (activeItems.any { string ->
+                    string.isNotEmpty() && string in str
                 }) {
                 view.hide()
             }
         }
-        if (!activeItems.contains("免流量"))
-            "Lcom/tencent/mobileqq/activity/QQSettingSettingActivity;->a()V".method.replaceNull(this)
-        true
-    } catch (t: Throwable) {
-        Utils.log(t)
-        false
+        if (activeItems.contains("免流量"))
+            "Lcom/tencent/mobileqq/activity/QQSettingSettingActivity;->a()V".method.replace(
+                this,
+                null
+            )
     }
-
-    override fun isEnabled() = isValid && activeItems.size != allItems.size
-
-    override fun isValid() = requireMinQQVersion(QQVersion.QQ_8_0_0)
 }

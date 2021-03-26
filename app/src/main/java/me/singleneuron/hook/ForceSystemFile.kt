@@ -28,37 +28,45 @@ import me.singleneuron.base.adapter.BaseDelayableConditionalHookAdapter
 import me.singleneuron.qn_kernel.data.hostInfo
 import me.singleneuron.qn_kernel.data.requireMinQQVersion
 import me.singleneuron.util.QQVersion
+import nil.nadph.qnotified.base.annotation.FunctionEntry
 import nil.nadph.qnotified.step.DexDeobfStep
 import nil.nadph.qnotified.step.Step
 import nil.nadph.qnotified.util.DexKit
 import nil.nadph.qnotified.util.Initiator
 
+@FunctionEntry
 object ForceSystemFile : BaseDelayableConditionalHookAdapter("forceSystemFile") {
 
     override fun doInit(): Boolean {
+        val hook = object : XposedMethodHookAdapter() {
+            override fun beforeMethod(param: MethodHookParam?) {
+                val context = hostInfo.application
+                val intent = Intent(context, ChooseFileAgentActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(intent)
+                param!!.result = null
+            }
+        }
         if (requireMinQQVersion(QQVersion.QQ_8_4_8)) {
             val plusPanelClass = Class.forName("com.tencent.mobileqq.pluspanel.appinfo.FileAppInfo")
             //特征字符串:"SmartDeviceProxyMgr create"
             val sessionInfoClass = Class.forName("com.tencent.mobileqq.activity.aio.SessionInfo")
             //特征字符串:"0X800407C"、"send_file"
-            XposedHelpers.findAndHookMethod(plusPanelClass, "a", Initiator._BaseChatPie(), sessionInfoClass, object : XposedMethodHookAdapter() {
-                override fun beforeMethod(param: MethodHookParam?) {
-                    val context = hostInfo.application
-                    context.startActivity(Intent(context, ChooseFileAgentActivity::class.java))
-                    param!!.result = null
-                }
-            })
+            XposedHelpers.findAndHookMethod(
+                plusPanelClass,
+                "a",
+                Initiator._BaseChatPie(),
+                sessionInfoClass,
+                hook)
         } else {
             val plusPanelClass = Class.forName("com.tencent.mobileqq.activity.aio.PlusPanel")
             val smartDeviceProxyMgrClass = DexKit.doFindClass(DexKit.C_SmartDeviceProxyMgr)
             //特征字符串:"0X800407C"、"send_file"
-            XposedHelpers.findAndHookMethod(plusPanelClass, "a", smartDeviceProxyMgrClass, object : XposedMethodHookAdapter() {
-                override fun beforeMethod(param: MethodHookParam?) {
-                    val context = hostInfo.application
-                    context.startActivity(Intent(context, ChooseFileAgentActivity::class.java))
-                    param!!.result = null
-                }
-            })
+            XposedHelpers.findAndHookMethod(
+                plusPanelClass,
+                "a",
+                smartDeviceProxyMgrClass,
+                hook)
         }
         return true
     }

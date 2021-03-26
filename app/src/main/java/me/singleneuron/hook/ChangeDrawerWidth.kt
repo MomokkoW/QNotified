@@ -29,26 +29,41 @@ import android.view.WindowManager
 import de.robv.android.xposed.XposedHelpers
 import me.singleneuron.base.adapter.BaseDelayableConditionalHookAdapter
 import me.singleneuron.qn_kernel.data.hostInfo
+import nil.nadph.qnotified.base.annotation.FunctionEntry
 import nil.nadph.qnotified.config.ConfigManager
 import nil.nadph.qnotified.util.Utils.PACKAGE_NAME_QQ
 
+@FunctionEntry
 object ChangeDrawerWidth : BaseDelayableConditionalHookAdapter("changeDrawerWidth") {
 
     override fun doInit(): Boolean {
-        XposedHelpers.findAndHookMethod(Resources::class.java, "getDimensionPixelSize", Int::class.javaPrimitiveType, object : XposedMethodHookAdapter() {
-            override fun beforeMethod(param: MethodHookParam?) {
-                if (param!!.args[0] == hostInfo.application.resources.getIdentifier("akx", "dimen", PACKAGE_NAME_QQ)) {
-                    param.result = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, width.toFloat(), (param.thisObject as Resources).displayMetrics).toInt()
+        XposedHelpers.findAndHookMethod(
+            Resources::class.java,
+            "getDimensionPixelSize",
+            Int::class.javaPrimitiveType,
+            object : XposedMethodHookAdapter() {
+                override fun beforeMethod(param: MethodHookParam?) {
+                    if (param!!.args[0] == hostInfo.application.resources.getIdentifier(
+                            "akx",
+                            "dimen",
+                            PACKAGE_NAME_QQ
+                        )
+                    ) {
+                        param.result = TypedValue.applyDimension(
+                            TypedValue.COMPLEX_UNIT_DIP,
+                            width.toFloat(),
+                            (param.thisObject as Resources).displayMetrics
+                        ).toInt()
+                    }
                 }
-            }
-        })
+            })
         return true
     }
 
     override fun setEnabled(enabled: Boolean) {}
 
     override fun isEnabled(): Boolean {
-        return width!=0
+        return width != 0
     }
 
     private const val ChangeDrawerWidth_width = "ChangeDrawerWidth_width"
@@ -58,12 +73,14 @@ object ChangeDrawerWidth : BaseDelayableConditionalHookAdapter("changeDrawerWidt
             return ConfigManager.getDefaultConfig().getIntOrDefault(ChangeDrawerWidth_width, 0)
         }
         set(value) {
-            ConfigManager.getDefaultConfig().apply { putInt(ChangeDrawerWidth_width, value); save() }
+            ConfigManager.getDefaultConfig()
+                .apply { putInt(ChangeDrawerWidth_width, value); save() }
         }
 
     fun getMaxWidth(context: Context): Float {
         val dm = DisplayMetrics()
-        val windowManager: WindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val windowManager: WindowManager =
+            context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         windowManager.defaultDisplay.getMetrics(dm)
         return (dm.widthPixels / dm.density)
     }

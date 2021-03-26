@@ -22,12 +22,16 @@
 package nil.nadph.qnotified.hook;
 
 import androidx.annotation.NonNull;
-
 import nil.nadph.qnotified.SyncUtils;
+import nil.nadph.qnotified.base.AbsFunctionItem;
+import nil.nadph.qnotified.base.internal.Delayable2SingleHookFuncItemProxy;
+import nil.nadph.qnotified.base.internal.IFunctionItemInterface;
 import nil.nadph.qnotified.step.Step;
 
 
-public abstract class BaseDelayableHook extends AbsDelayableHook {
+public abstract class BaseDelayableHook extends AbsDelayableHook implements IFunctionItemInterface {
+
+    private AbsFunctionItem mStub = null;
 
     @Override
     public boolean isTargetProc() {
@@ -69,7 +73,16 @@ public abstract class BaseDelayableHook extends AbsDelayableHook {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" + (isInited() ? "inited" : "") + "," + (isEnabled() ? "enabled" : "") + "," + SyncUtils.getProcessName() + ")";
+        return getClass().getSimpleName() + "(" + (isInited() ? "inited" : "") + "," + (isEnabled()
+            ? "enabled" : "") + "," + SyncUtils.getProcessName() + ")";
     }
 
+    @NonNull
+    @Override
+    public AbsFunctionItem asFunctionItem() {
+        if (mStub == null) {
+            mStub = new Delayable2SingleHookFuncItemProxy(this);
+        }
+        return mStub;
+    }
 }
