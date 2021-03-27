@@ -132,7 +132,6 @@ public class SendBatchMsg {
                         .create();
                     alertDialog.show();
                     setEditDialogStyle(alertDialog);
-<<<<<<< HEAD
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {

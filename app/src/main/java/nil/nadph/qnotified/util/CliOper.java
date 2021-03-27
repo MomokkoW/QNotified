@@ -33,9 +33,6 @@ import nil.nadph.qnotified.config.ConfigManager;
 
 public class CliOper {
 
-    private static final String appCenterToken =
-        BuildConfig.DEBUG ? "530d3819-3543-46e3-8c59-5576604f3801"
-            : "ddf4b597-1833-45dd-af28-96ca504b8123";
     private static boolean appCenterInit = false;
     private static final String appCenterToken = BuildConfig.DEBUG?"9c428a1c-3d42-44e1-9c33-c17282f6bd92":"9c428a1c-3d42-44e1-9c33-c17282f6bd92";
 

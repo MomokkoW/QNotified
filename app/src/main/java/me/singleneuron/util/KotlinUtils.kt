@@ -202,11 +202,16 @@ fun showEulaDialog(activity: Activity) {
             editText.isEnabled = true
             editText.visibility = View.VISIBLE
 <<<<<<< HEAD
+<<<<<<< HEAD
             textView.text = textView.text.toString() + "\nLOL 输入1即可 别问为什么 问就是你懂得"
 =======
             textView.text =
                 textView.text.toString() + "\n若继续进入该功能,请在下方输入框中输入 我已阅读并同意用户协议 ,退出该页面请点取消"
 >>>>>>> 61f49debf077fdca7d67f9b70af1f472b7ebd3d1
+=======
+            textView.text =
+                textView.text.toString() + "\n若继续进入该功能,请在下方输入框中输入 我已阅读并同意用户协议 ,退出该页面请点取消"
+>>>>>>> ae791b5e5f93da95a9a4ecec67e90693926df037
             if (LicenseStatus.isInsider()) {
                 editText.setText("1")
             }

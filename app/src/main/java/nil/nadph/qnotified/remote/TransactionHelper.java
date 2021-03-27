@@ -37,8 +37,6 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
-import nil.nadph.qnotified.util.Utils;
-
 public class TransactionHelper {
 
     private static final String TAG = "TransactionHelper";

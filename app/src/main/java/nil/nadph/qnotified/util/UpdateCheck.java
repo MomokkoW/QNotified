@@ -50,7 +50,7 @@ import nil.nadph.qnotified.ui.CustomDialog;
 import nil.nadph.qnotified.ui.ViewBuilder;
 
 public class UpdateCheck implements View.OnClickListener, Runnable {
-
+    
     public static final String UPDATE_INFO_GET1 = "https://api.appcenter.ms/v0.1/public/sdk/apps/9c428a1c-3d42-44e1-9c33-c17282f6bd92/releases/latest";
     public static final String qn_update_info = "qn_update_info";
     public static final String qn_update_time = "qn_update_time";
