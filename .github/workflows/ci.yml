@@ -3,6 +3,8 @@ name: Build CI
 on:
   pull_request:
     branches: [ master ]
+    
+  workflow_dispatch:
 
 env:
   WARN_ON_PR: "artifact upload is disabled due to the workflow is trigged by pull request."
